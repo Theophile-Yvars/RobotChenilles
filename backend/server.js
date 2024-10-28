@@ -3,6 +3,7 @@ const Gpio = require('pigpio').Gpio;
 const { exec } = require('child_process');
 
 const app = express();
+const videoStream = require('raspberrypi-node-camera-web-streamer');
 
 // Configuration des pins GPIO pour les moteurs
 const motor1 = new Gpio(17, { mode: Gpio.OUTPUT });
@@ -12,6 +13,16 @@ const motor2 = new Gpio(27, { mode: Gpio.OUTPUT });
 app.get('/video', (req, res) => {
   res.redirect('http://192.168.1.161:8080/?action=stream');
 });
+
+videoStream.acceptConnections(app, {
+    width: 1280,
+    height: 720,
+    fps: 16,
+    encoding: 'JPEG',
+    quality: 7 //lower is faster
+}, '/stream.mjpg', true);
+
+app.listen(3000, () => console.log(`Listening on port ${port}!`));
 
 // Route pour contrôler le robot
 app.get('/move', (req, res) => {
