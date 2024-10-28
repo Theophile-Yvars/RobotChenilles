@@ -1,9 +1,12 @@
 const express = require('express');
+const http = require('http');
+const socketIo = require('socket.io');
+const ffmpeg = require('fluent-ffmpeg');
 const Gpio = require('pigpio').Gpio;
-const { exec } = require('child_process');
 
 const app = express();
-const videoStream = require('raspberrypi-node-camera-web-streamer');
+const server = http.createServer(app);
+const io = socketIo(server);
 
 // Configuration des pins GPIO pour les moteurs
 const motor1 = new Gpio(17, { mode: Gpio.OUTPUT });
@@ -11,18 +14,8 @@ const motor2 = new Gpio(27, { mode: Gpio.OUTPUT });
 
 // Route pour accéder au flux vidéo
 app.get('/video', (req, res) => {
-  res.redirect('http://192.168.1.161:8080/?action=stream');
+  res.sendFile(__dirname + '/index.html');
 });
-
-videoStream.acceptConnections(app, {
-    width: 1280,
-    height: 720,
-    fps: 16,
-    encoding: 'JPEG',
-    quality: 7 //lower is faster
-}, '/stream.mjpg', true);
-
-app.listen(3000, () => console.log(`Listening on port ${port}!`));
 
 // Route pour contrôler le robot
 app.get('/move', (req, res) => {
@@ -57,8 +50,36 @@ app.get('/move', (req, res) => {
   res.send(`Moving with front: ${front}, back: ${back}, left: ${left}, right: ${right}`);
 });
 
+// Diffusion du flux vidéo via WebSocket
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  const command = ffmpeg('/dev/video0')
+    .inputFormat('v4l2')
+    .videoCodec('libx264')
+    .format('mpegts')
+    .on('start', (commandLine) => {
+      console.log('Spawned Ffmpeg with command: ' + commandLine);
+    })
+    .on('error', (err) => {
+      console.log('An error occurred: ' + err.message);
+    })
+    .on('end', () => {
+      console.log('Processing finished !');
+    })
+    .on('data', (data) => {
+      socket.emit('video', data);
+    })
+    .run();
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+    command.kill();
+  });
+});
+
 // Démarrage du serveur
 const PORT = 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
