@@ -3,6 +3,22 @@ const http = require('http');
 const socketIo = require('socket.io');
 const ffmpeg = require('fluent-ffmpeg');
 const Gpio = require('pigpio').Gpio;
+const winston = require('winston');
+
+// Configuration de Winston pour la journalisation
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.printf(({ timestamp, level, message }) => {
+      return `${timestamp} ${level}: ${message}`;
+    })
+  ),
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: 'app.log' })
+  ]
+});
 
 const app = express();
 const server = http.createServer(app);
@@ -14,6 +30,7 @@ const motor2 = new Gpio(27, { mode: Gpio.OUTPUT });
 
 // Route pour accéder au flux vidéo
 app.get('/video', (req, res) => {
+  logger.info('Serving video stream page');
   res.sendFile(__dirname + '/index.html');
 });
 
@@ -47,25 +64,26 @@ app.get('/move', (req, res) => {
   motor1.pwmWrite(motor1Speed);
   motor2.pwmWrite(motor2Speed);
 
+  logger.info(`Moving with front: ${front}, back: ${back}, left: ${left}, right: ${right}`);
   res.send(`Moving with front: ${front}, back: ${back}, left: ${left}, right: ${right}`);
 });
 
 // Diffusion du flux vidéo via WebSocket
 io.on('connection', (socket) => {
-  console.log('New client connected');
+  logger.info('New client connected');
 
   const command = ffmpeg('/dev/video0')
     .inputFormat('v4l2')
     .videoCodec('libx264')
     .format('mpegts')
     .on('start', (commandLine) => {
-      console.log('Spawned Ffmpeg with command: ' + commandLine);
+      logger.info('Spawned Ffmpeg with command: ' + commandLine);
     })
     .on('error', (err) => {
-      console.log('An error occurred: ' + err.message);
+      logger.error('An error occurred: ' + err.message);
     })
     .on('end', () => {
-      console.log('Processing finished !');
+      logger.info('Processing finished !');
     })
     .on('data', (data) => {
       socket.emit('video', data);
@@ -73,7 +91,7 @@ io.on('connection', (socket) => {
     .run();
 
   socket.on('disconnect', () => {
-    console.log('Client disconnected');
+    logger.info('Client disconnected');
     command.kill();
   });
 });
@@ -81,5 +99,5 @@ io.on('connection', (socket) => {
 // Démarrage du serveur
 const PORT = 3000;
 server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  logger.info(`Server is running on port ${PORT}`);
 });
