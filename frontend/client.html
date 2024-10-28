@@ -26,6 +26,14 @@
       video.src = url;
     });
 
+    socket.on('connect_error', (err) => {
+      console.error('Connection error:', err);
+    });
+
+    socket.on('connect_timeout', (timeout) => {
+      console.error('Connection timeout:', timeout);
+    });
+
     function sendCommand(directions) {
       const queryParams = new URLSearchParams(directions).toString();
       fetch(`http://192.168.1.161:3000/move?${queryParams}`)

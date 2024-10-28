@@ -88,6 +88,10 @@ io.on('connection', (socket) => {
     logger.info('Client disconnected');
     command.kill();
   });
+
+  socket.on('error', (err) => {
+    logger.error('Socket error: ' + err.message);
+  });
 });
 
 // Démarrage du serveur
