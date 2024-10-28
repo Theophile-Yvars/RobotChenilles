@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Robot Control</title>
+</head>
+<body>
+  <button onclick="sendCommand({ front: true })">Forward</button>
+  <button onclick="sendCommand({ back: true })">Backward</button>
+  <button onclick="sendCommand({ left: true })">Left</button>
+  <button onclick="sendCommand({ right: true })">Right</button>
+  <button onclick="sendCommand({ front: false, back: false, left: false, right: false })">Stop</button>
+
+  <h2>Video Stream</h2>
+  <img src="http://192.168.1.161:3000/video" alt="Video Stream" />
+
+  <script>
+    function sendCommand(directions) {
+      const queryParams = new URLSearchParams(directions).toString();
+      fetch(`http://192.168.1.161:3000/move?${queryParams}`)
+        .then(response => response.text())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error:', error));
+    }
+  </script>
+</body>
+</html>
