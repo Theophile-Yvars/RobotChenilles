@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Robot Control</title>
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.0.0/dist/socket.io.min.js"></script>
 </head>
 <body>
   <button onclick="sendCommand({ front: true })">Forward</button>
@@ -17,7 +17,7 @@
   <video id="video" autoplay></video>
 
   <script>
-    const socket = io();
+    const socket = io('http://192.168.1.161:3000');
     const video = document.getElementById('video');
 
     socket.on('video', (data) => {
@@ -28,7 +28,7 @@
 
     function sendCommand(directions) {
       const queryParams = new URLSearchParams(directions).toString();
-      fetch(`/move?${queryParams}`)
+      fetch(`http://192.168.1.161:3000/move?${queryParams}`)
         .then(response => response.text())
         .then(data => console.log(data))
         .catch(error => console.error('Error:', error));

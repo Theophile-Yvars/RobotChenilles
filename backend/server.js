@@ -28,12 +28,6 @@ const io = socketIo(server);
 const motor1 = new Gpio(17, { mode: Gpio.OUTPUT });
 const motor2 = new Gpio(27, { mode: Gpio.OUTPUT });
 
-// Route pour accéder au flux vidéo
-app.get('/video', (req, res) => {
-  logger.info('Serving video stream page');
-  res.sendFile(__dirname + '/index.html');
-});
-
 // Route pour contrôler le robot
 app.get('/move', (req, res) => {
   const front = req.query.front === 'true';
