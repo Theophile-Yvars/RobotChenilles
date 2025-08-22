@@ -1,0 +1,115 @@
+/* RobotControl.css */
+.robot-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f5f7fa;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+}
+
+.robot-container h1 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.video-section {
+  margin-bottom: 20px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.video-feed {
+  width: 100%;
+  max-width: 640px;
+  height: auto;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  border-radius: 12px;
+  border: none;
+}
+
+.controls-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.controls-row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+button {
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  background-color: #4a6bff;
+  color: white;
+  transition: all 0.2s ease;
+  width: 120px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(74, 107, 255, 0.3);
+}
+
+button:hover {
+  background-color: #3a5bef;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(74, 107, 255, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(74, 107, 255, 0.3);
+}
+
+button.stop-button {
+  background-color: #ff4757;
+}
+
+button.stop-button:hover {
+  background-color: #e84118;
+}
+
+.keyboard-instruction {
+  color: #7f8c8d;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.active-key {
+  background-color: #2ed573;
+}
+
+.active-key:hover {
+  background-color: #22c762;
+}
+
+/* Animation pour les boutons */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+button:active {
+  animation: pulse 0.3s ease;
+}
