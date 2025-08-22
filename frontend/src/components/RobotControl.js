@@ -3,6 +3,7 @@ import "../styles/RobotControl.css";
 
 function RobotControl() {
   const [pressedKeys, setPressedKeys] = useState(new Set());
+  const [activeButtons, setActiveButtons] = useState([]);
 
   const sendCommand = (direction) => {
     fetch(`http://192.168.1.127:5000/move/${direction}`, { method: "POST" })
@@ -38,12 +39,29 @@ function RobotControl() {
     };
   }, []);
 
-  // Détermine la direction en fonction des touches enfoncées
   useEffect(() => {
     if (pressedKeys.size === 0) {
       sendCommand("stop");
+      setActiveButtons([]);
       return;
     }
+
+    const newActiveButtons = Array.from(pressedKeys).map((key) => {
+      switch (key) {
+        case "ArrowUp":
+          return "forward";
+        case "ArrowDown":
+          return "backward";
+        case "ArrowLeft":
+          return "left";
+        case "ArrowRight":
+          return "right";
+        default:
+          return "";
+      }
+    }).filter(Boolean);
+
+    setActiveButtons(newActiveButtons);
 
     let direction = "";
     if (pressedKeys.has("ArrowUp")) direction += "forward_";
@@ -51,41 +69,63 @@ function RobotControl() {
     if (pressedKeys.has("ArrowLeft")) direction += "left";
     if (pressedKeys.has("ArrowRight")) direction += "right";
 
-    // Envoie la direction combinée (ex: "forward_left")
     if (direction) {
-      sendCommand(direction.replace(/_$/, "")); // Supprime le dernier "_" si nécessaire
+      sendCommand(direction.replace(/_$/, ""));
     }
   }, [pressedKeys]);
 
-  const handleMove = (baseDirection) => {
-    // Pour les boutons, envoie simplement la direction de base
-    sendCommand(baseDirection);
+  const handleMove = (direction) => {
+    sendCommand(direction);
   };
 
   return (
     <div className="robot-container">
-      <h1>Contrôle du robot</h1>
+      <h1>Contrôle du Robot</h1>
       <div className="video-section">
         <img
           src="http://192.168.1.127:5000/video"
-          alt="Camera Stream"
+          alt="Flux vidéo du robot"
           className="video-feed"
         />
       </div>
       <div className="controls-section">
         <div className="controls-row">
-          <button onClick={() => handleMove("forward")}>↑ Avant</button>
+          <button
+            onClick={() => handleMove("forward")}
+            className={activeButtons.includes("forward") ? "active-key" : ""}
+          >
+            ↑ Avant
+          </button>
         </div>
         <div className="controls-row">
-          <button onClick={() => handleMove("left")}>← Gauche</button>
-          <button onClick={() => handleMove("stop")}>⏹ Stop</button>
-          <button onClick={() => handleMove("right")}>→ Droite</button>
+          <button
+            onClick={() => handleMove("left")}
+            className={activeButtons.includes("left") ? "active-key" : ""}
+          >
+            ← Gauche
+          </button>
+          <button onClick={() => handleMove("stop")} className="stop-button">
+            ■ Stop
+          </button>
+          <button
+            onClick={() => handleMove("right")}
+            className={activeButtons.includes("right") ? "active-key" : ""}
+          >
+            → Droite
+          </button>
         </div>
         <div className="controls-row">
-          <button onClick={() => handleMove("backward")}>↓ Arrière</button>
+          <button
+            onClick={() => handleMove("backward")}
+            className={activeButtons.includes("backward") ? "active-key" : ""}
+          >
+            ↓ Arrière
+          </button>
         </div>
       </div>
-      <p>Utilise les flèches du clavier pour contrôler le robot (combinations possibles).</p>
+      <p className="keyboard-instruction">
+        Utilisez les flèches du clavier pour contrôler le robot (combinations possibles).
+      </p>
     </div>
   );
 }
