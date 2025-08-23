@@ -5,26 +5,31 @@ function RobotControl() {
   const [pressedKeys, setPressedKeys] = useState(new Set());
   const [activeButtons, setActiveButtons] = useState([]);
 
-  const sendCommand = (direction) => {
-    fetch(`http://192.168.1.127:5000/move/${direction}`, { method: "POST" })
+  // Envoie une commande au backend Flask
+  const sendCommand = (endpoint, method = "POST") => {
+    fetch(`http://192.168.1.127:5000/${endpoint}`, { method })
       .then((res) => {
-        if (!res.ok) throw new Error("Erreur lors de l'envoi de la commande");
+        if (!res.ok) throw new Error(`Erreur: ${res.status}`);
       })
       .catch((err) => console.error(err));
   };
 
+  // Gestion des touches clavier
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-        setPressedKeys((prevKeys) => new Set(prevKeys).add(e.key));
+      const { key } = e;
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "a", "q"].includes(key)) {
+        e.preventDefault(); // Évite le défilement de la page
+        setPressedKeys((prevKeys) => new Set(prevKeys).add(key));
       }
     };
 
     const handleKeyUp = (e) => {
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
+      const { key } = e;
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "a", "q"].includes(key)) {
         setPressedKeys((prevKeys) => {
           const newKeys = new Set(prevKeys);
-          newKeys.delete(e.key);
+          newKeys.delete(key);
           return newKeys;
         });
       }
@@ -32,50 +37,53 @@ function RobotControl() {
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
   }, []);
 
+  // Envoie les commandes en fonction des touches pressées
   useEffect(() => {
     if (pressedKeys.size === 0) {
-      sendCommand("stop");
+      sendCommand("move/stop");
       setActiveButtons([]);
       return;
     }
 
-    const newActiveButtons = Array.from(pressedKeys).map((key) => {
-      switch (key) {
-        case "ArrowUp":
-          return "forward";
-        case "ArrowDown":
-          return "backward";
-        case "ArrowLeft":
-          return "left";
-        case "ArrowRight":
-          return "right";
-        default:
-          return "";
-      }
-    }).filter(Boolean);
+    // Mappage des touches aux commandes
+    const keyToCommand = {
+      ArrowUp: "forward",
+      ArrowDown: "backward",
+      ArrowLeft: "left",
+      ArrowRight: "right",
+      a: "cam_up",    // Touche 'A' pour monter la caméra
+      q: "cam_down",  // Touche 'Q' pour descendre la caméra
+    };
 
+    const newActiveButtons = Array.from(pressedKeys).map((key) => keyToCommand[key]).filter(Boolean);
     setActiveButtons(newActiveButtons);
 
-    let direction = "";
-    if (pressedKeys.has("ArrowUp")) direction += "forward_";
-    if (pressedKeys.has("ArrowDown")) direction += "backward_";
-    if (pressedKeys.has("ArrowLeft")) direction += "left";
-    if (pressedKeys.has("ArrowRight")) direction += "right";
-
-    if (direction) {
-      sendCommand(direction.replace(/_$/, ""));
-    }
+    // Envoie la commande pour chaque touche active
+    newActiveButtons.forEach((command) => {
+      if (command === "cam_up" || command === "cam_down") {
+        sendCommand(command, "GET"); // Les routes cam_up/cam_down sont en GET
+      } else {
+        sendCommand(`move/${command}`);
+      }
+    });
   }, [pressedKeys]);
 
-  const handleMove = (direction) => {
-    sendCommand(direction);
+  // Gestion des clics sur les boutons
+  const handleMove = (command) => {
+    if (command === "stop") {
+      sendCommand("move/stop");
+      setActiveButtons([]);
+    } else if (command === "cam_up" || command === "cam_down") {
+      sendCommand(command, "GET");
+    } else {
+      sendCommand(`move/${command}`);
+    }
   };
 
   return (
@@ -89,6 +97,7 @@ function RobotControl() {
         />
       </div>
       <div className="controls-section">
+        {/* Boutons de déplacement */}
         <div className="controls-row">
           <button
             onClick={() => handleMove("forward")}
@@ -122,9 +131,25 @@ function RobotControl() {
             ↓ Arrière
           </button>
         </div>
+        {/* Boutons pour la caméra */}
+        <div className="controls-row">
+          <button
+            onClick={() => handleMove("cam_up")}
+            className={activeButtons.includes("cam_up") ? "active-key" : ""}
+          >
+            A (Monter Caméra)
+          </button>
+          <button
+            onClick={() => handleMove("cam_down")}
+            className={activeButtons.includes("cam_down") ? "active-key" : ""}
+          >
+            Q (Descendre Caméra)
+          </button>
+        </div>
       </div>
       <p className="keyboard-instruction">
-        Utilisez les flèches du clavier pour contrôler le robot (combinations possibles).
+        Utilisez les flèches du clavier pour contrôler le robot. <br />
+        Touches <strong>A</strong> et <strong>Q</strong> pour monter/descendre la caméra.
       </p>
     </div>
   );

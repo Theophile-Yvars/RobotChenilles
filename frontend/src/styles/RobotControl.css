@@ -113,3 +113,16 @@ button.stop-button:hover {
 button:active {
   animation: pulse 0.3s ease;
 }
+
+/* Ajoute cela à ton fichier RobotControl.css existant */
+.controls-row:last-child {
+  margin-top: 12px;
+}
+
+.controls-row:last-child button {
+  background-color: #1e90ff;
+}
+
+.controls-row:last-child button:hover {
+  background-color: #1c7ed6;
+}

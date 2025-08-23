@@ -2,13 +2,15 @@ from flask import Flask, Response
 from picamera2 import Picamera2
 import cv2
 from gpiozero import Motor
+import RPi.GPIO as GPIO
+from time import sleep
 
 app = Flask(__name__)
 
 # --- Configuration des moteurs ---
-# Exemple : moteur gauche sur GPIO 17 et 18, moteur droit sur 22 et 23
-motor_left = Motor(forward=17, backward=18)
-motor_right = Motor(forward=22, backward=23)
+# Exemple : moteur gauche sur GPIO 26 et 13, moteur droit sur 12 et 16
+motor_left = Motor(forward=13, backward=26)  # BCM numbers
+motor_right = Motor(forward=16, backward=12)
 
 
 def stop_motors():
@@ -45,10 +47,53 @@ picam2.start()
 def gen_frames():
     while True:
         frame = picam2.capture_array()
+        # Retourne l'image verticalement (haut/bas)
+        frame = cv2.flip(frame, 0)  # 0 = retour vertical, 1 = retour horizontal, -1 = retour vertical + horizontal
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+
+# Configuration du mode GPIO
+step_pins = [14, 15, 18, 23]
+GPIO.setmode(GPIO.BCM)
+for pin in step_pins:
+    GPIO.setup(pin, GPIO.OUT)
+    GPIO.output(pin, False)
+
+# Sequence pour un moteur pas-a-pas unipolaire (4 phases)
+step_sequence = [
+    [1, 0, 0, 0],
+    [1, 1, 0, 0],
+    [0, 1, 0, 0],
+    [0, 1, 1, 0],
+    [0, 0, 1, 0],
+    [0, 0, 1, 1],
+    [0, 0, 0, 1],
+    [1, 0, 0, 1]
+]
+
+
+def move_steps(steps, direction=1, delay=0.002):
+    for _ in range(steps):
+        for step in (range(8)[::direction]):
+            for pin in range(4):
+                GPIO.output(step_pins[pin], step_sequence[step][pin])
+            sleep(delay)
+
+
+@app.route('/cam_up')
+def cam_up(steps=20, delay=0.002):
+    move_steps(steps, 1, delay)
+    return {"status": "ok"}, 200
+
+
+@app.route('/cam_down')
+def cam_down(steps=20, delay=0.002):
+    move_steps(steps, -1, delay)
+    return {"status": "ok"}, 200
 
 
 @app.route('/video')
