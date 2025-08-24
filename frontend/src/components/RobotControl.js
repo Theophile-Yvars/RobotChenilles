@@ -3,7 +3,6 @@ import "../styles/RobotControl.css";
 
 function RobotControl() {
   const [pressedKeys, setPressedKeys] = useState(new Set());
-  const [activeButtons, setActiveButtons] = useState([]);
   const [temperature, setTemperature] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,8 +18,9 @@ function RobotControl() {
 
   // Récupère la température depuis le backend
   useEffect(() => {
+    let firstLoad = true;
+
     const fetchTemperature = () => {
-      setIsLoading(true);
       fetch("http://192.168.1.127:5000/temperature")
         .then((res) => res.json())
         .then((data) => {
@@ -29,17 +29,18 @@ function RobotControl() {
           } else {
             setTemperature(data);
             setError(null);
+            if (firstLoad) {
+              setIsLoading(false);
+              firstLoad = false;
+            }
           }
-          setIsLoading(false);
         })
         .catch((err) => {
           setError("Erreur de connexion au capteur");
-          setIsLoading(false);
           console.error(err);
         });
     };
 
-    // Récupère la température immédiatement et toutes les 2 secondes
     fetchTemperature();
     const interval = setInterval(fetchTemperature, 2000);
     return () => clearInterval(interval);
@@ -50,7 +51,7 @@ function RobotControl() {
     const handleKeyDown = (e) => {
       const { key } = e;
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "a", "q"].includes(key)) {
-        e.preventDefault(); // Évite le défilement de la page
+        e.preventDefault();
         setPressedKeys((prevKeys) => new Set(prevKeys).add(key));
       }
     };
@@ -76,41 +77,26 @@ function RobotControl() {
   useEffect(() => {
     if (pressedKeys.size === 0) {
       sendCommand("move/stop");
-      setActiveButtons([]);
       return;
     }
-    // Mappage des touches aux commandes
     const keyToCommand = {
       ArrowUp: "forward",
       ArrowDown: "backward",
       ArrowLeft: "left",
       ArrowRight: "right",
-      a: "cam_up",    // Touche 'A' pour monter la caméra
-      q: "cam_down",  // Touche 'Q' pour descendre la caméra
+      a: "cam_up",
+      q: "cam_down",
     };
-    const newActiveButtons = Array.from(pressedKeys).map((key) => keyToCommand[key]).filter(Boolean);
-    setActiveButtons(newActiveButtons);
-    // Envoie la commande pour chaque touche active
-    newActiveButtons.forEach((command) => {
-      if (command === "cam_up" || command === "cam_down") {
-        sendCommand(command, "GET"); // Les routes cam_up/cam_down sont en GET
-      } else {
-        sendCommand(`move/${command}`);
+
+    pressedKeys.forEach((key) => {
+      const command = keyToCommand[key];
+      if (command) {
+        sendCommand(command === "cam_up" || command === "cam_down" ? command : `move/${command}`,
+          command === "cam_up" || command === "cam_down" ? "GET" : "POST"
+        );
       }
     });
   }, [pressedKeys]);
-
-  // Gestion des clics sur les boutons
-  const handleMove = (command) => {
-    if (command === "stop") {
-      sendCommand("move/stop");
-      setActiveButtons([]);
-    } else if (command === "cam_up" || command === "cam_down") {
-      sendCommand(command, "GET");
-    } else {
-      sendCommand(`move/${command}`);
-    }
-  };
 
   // Fonction pour obtenir le statut de la température
   const getTemperatureStatus = (temp) => {
@@ -131,59 +117,8 @@ function RobotControl() {
           className="video-feed"
         />
       </div>
-      <div className="controls-section">
-        {/* Boutons de déplacement */}
-        <div className="controls-row">
-          <button
-            onClick={() => handleMove("forward")}
-            className={activeButtons.includes("forward") ? "active-key" : ""}
-          >
-            ↑ Avant
-          </button>
-        </div>
-        <div className="controls-row">
-          <button
-            onClick={() => handleMove("left")}
-            className={activeButtons.includes("left") ? "active-key" : ""}
-          >
-            ← Gauche
-          </button>
-          <button onClick={() => handleMove("stop")} className="stop-button">
-            ■ Stop
-          </button>
-          <button
-            onClick={() => handleMove("right")}
-            className={activeButtons.includes("right") ? "active-key" : ""}
-          >
-            → Droite
-          </button>
-        </div>
-        <div className="controls-row">
-          <button
-            onClick={() => handleMove("backward")}
-            className={activeButtons.includes("backward") ? "active-key" : ""}
-          >
-            ↓ Arrière
-          </button>
-        </div>
-        {/* Boutons pour la caméra */}
-        <div className="controls-row">
-          <button
-            onClick={() => handleMove("cam_up")}
-            className={activeButtons.includes("cam_up") ? "active-key" : ""}
-          >
-            A (Monter Caméra)
-          </button>
-          <button
-            onClick={() => handleMove("cam_down")}
-            className={activeButtons.includes("cam_down") ? "active-key" : ""}
-          >
-            Q (Descendre Caméra)
-          </button>
-        </div>
-      </div>
 
-      {/* Carte de température en bas */}
+      {/* Carte de température */}
       <div className="temperature-card">
         <div className="temperature-header">
           <h2>Température</h2>
@@ -201,8 +136,7 @@ function RobotControl() {
             </div>
           ) : temperature ? (
             <div className="temperature-value">
-              <p>{temperature.temperature}</p>
-              <span>°C</span>
+              <p>{temperature.temperature} <span>°C</span></p>
             </div>
           ) : (
             <p>Pas de données disponibles</p>
