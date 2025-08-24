@@ -4,8 +4,12 @@ import cv2
 from gpiozero import Motor
 import RPi.GPIO as GPIO
 from time import sleep
+import subprocess
+from flask import jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # --- Configuration des moteurs ---
 # Exemple : moteur gauche sur GPIO 26 et 13, moteur droit sur 12 et 16
@@ -53,7 +57,6 @@ def gen_frames():
         frame = buffer.tobytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
 
 
 # Configuration du mode GPIO
@@ -118,6 +121,27 @@ def move(direction):
         return {"status": "error", "message": "Direction inconnue"}, 400
 
     return {"status": "ok"}, 200
+
+
+@app.route('/temperature')
+def get_temperature():
+    try:
+        result = subprocess.run(
+            ["/home/pi/read_temp.sh"],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        temperature_output = result.stdout.strip()
+        if "Erreur" in temperature_output or "non detecte" in temperature_output:
+            return jsonify({"error": temperature_output}), 404
+        else:
+            temperature = float(temperature_output)
+            return jsonify({"temperature": round(temperature, 2), "unit": "Â°C"}), 200
+    except subprocess.CalledProcessError as e:
+        return jsonify({"error": "Erreur lors de la lecture du capteur"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == "__main__":

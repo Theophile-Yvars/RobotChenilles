@@ -4,6 +4,9 @@ import "../styles/RobotControl.css";
 function RobotControl() {
   const [pressedKeys, setPressedKeys] = useState(new Set());
   const [activeButtons, setActiveButtons] = useState([]);
+  const [temperature, setTemperature] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Envoie une commande au backend Flask
   const sendCommand = (endpoint, method = "POST") => {
@@ -14,6 +17,34 @@ function RobotControl() {
       .catch((err) => console.error(err));
   };
 
+  // Récupère la température depuis le backend
+  useEffect(() => {
+    const fetchTemperature = () => {
+      setIsLoading(true);
+      fetch("http://192.168.1.127:5000/temperature")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) {
+            setError(data.error);
+          } else {
+            setTemperature(data);
+            setError(null);
+          }
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          setError("Erreur de connexion au capteur");
+          setIsLoading(false);
+          console.error(err);
+        });
+    };
+
+    // Récupère la température immédiatement et toutes les 2 secondes
+    fetchTemperature();
+    const interval = setInterval(fetchTemperature, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Gestion des touches clavier
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -23,7 +54,6 @@ function RobotControl() {
         setPressedKeys((prevKeys) => new Set(prevKeys).add(key));
       }
     };
-
     const handleKeyUp = (e) => {
       const { key } = e;
       if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "a", "q"].includes(key)) {
@@ -34,7 +64,6 @@ function RobotControl() {
         });
       }
     };
-
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     return () => {
@@ -50,7 +79,6 @@ function RobotControl() {
       setActiveButtons([]);
       return;
     }
-
     // Mappage des touches aux commandes
     const keyToCommand = {
       ArrowUp: "forward",
@@ -60,10 +88,8 @@ function RobotControl() {
       a: "cam_up",    // Touche 'A' pour monter la caméra
       q: "cam_down",  // Touche 'Q' pour descendre la caméra
     };
-
     const newActiveButtons = Array.from(pressedKeys).map((key) => keyToCommand[key]).filter(Boolean);
     setActiveButtons(newActiveButtons);
-
     // Envoie la commande pour chaque touche active
     newActiveButtons.forEach((command) => {
       if (command === "cam_up" || command === "cam_down") {
@@ -84,6 +110,15 @@ function RobotControl() {
     } else {
       sendCommand(`move/${command}`);
     }
+  };
+
+  // Fonction pour obtenir le statut de la température
+  const getTemperatureStatus = (temp) => {
+    if (!temp) return { label: "Inconnu", color: "#7f8c8d" };
+    if (temp < 10) return { label: "Très froid", color: "#4a6bff" };
+    if (temp < 25) return { label: "Frais", color: "#2ed573" };
+    if (temp < 35) return { label: "Normal", color: "#ffa502" };
+    return { label: "Chaud", color: "#ff4757" };
   };
 
   return (
@@ -147,6 +182,50 @@ function RobotControl() {
           </button>
         </div>
       </div>
+
+      {/* Carte de température en bas */}
+      <div className="temperature-card">
+        <div className="temperature-header">
+          <h2>Température</h2>
+          <div className="temperature-icon">🌡️</div>
+        </div>
+        <div className="temperature-content">
+          {isLoading ? (
+            <div className="temperature-loading">
+              <div className="spinner"></div>
+              <p>Chargement...</p>
+            </div>
+          ) : error ? (
+            <div className="temperature-error">
+              <p>{error}</p>
+            </div>
+          ) : temperature ? (
+            <div className="temperature-value">
+              <p>{temperature.temperature}</p>
+              <span>°C</span>
+            </div>
+          ) : (
+            <p>Pas de données disponibles</p>
+          )}
+        </div>
+        {temperature && (
+          <div className="temperature-status">
+            <div className="status-bar">
+              <div
+                className="status-fill"
+                style={{
+                  width: `${Math.min(temperature.temperature, 50)}%`,
+                  backgroundColor: getTemperatureStatus(temperature.temperature).color
+                }}
+              ></div>
+            </div>
+            <p style={{ color: getTemperatureStatus(temperature.temperature).color }}>
+              {getTemperatureStatus(temperature.temperature).label}
+            </p>
+          </div>
+        )}
+      </div>
+
       <p className="keyboard-instruction">
         Utilisez les flèches du clavier pour contrôler le robot. <br />
         Touches <strong>A</strong> et <strong>Q</strong> pour monter/descendre la caméra.

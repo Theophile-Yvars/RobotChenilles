@@ -5,3 +5,8 @@ Commande sur le raspberry :
 pinout
 
 montre toutes les pins
+
+
+
+
+=> /home/pi/read_temp.sh
