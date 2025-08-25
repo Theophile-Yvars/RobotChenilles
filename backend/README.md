@@ -10,3 +10,10 @@ montre toutes les pins
 
 
 => /home/pi/read_temp.sh
+
+
+
+
+sudo systemctl daemon-reload
+sudo systemctl enable robot-backend.service
+sudo systemctl start robot-backend.service
