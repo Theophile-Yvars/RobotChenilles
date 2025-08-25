@@ -1,0 +1,15 @@
+.keyboard-instruction {
+  color: #7f8c8d;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Style pour mettre en avant les touches actives (si tu ajoutes cette feature plus tard) */
+.active-key {
+  background-color: #2ed573;
+}
+
+.active-key:hover {
+  background-color: #22c762;
+}
