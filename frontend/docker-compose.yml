@@ -5,4 +5,3 @@ services:
     image: robot-chenille/frontend:0.0.0
     ports:
       - "3000:80"  # on mappe Nginx sur le port 3000
-    restart: always
