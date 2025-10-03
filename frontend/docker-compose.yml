@@ -5,3 +5,14 @@ services:
     image: robot-chenille/frontend:0.0.0
     ports:
       - "3000:80"  # on mappe Nginx sur le port 3000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`myrobot.theophile-yvars.com`)"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=web"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
