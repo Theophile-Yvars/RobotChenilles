@@ -4,6 +4,8 @@ Un système de contrôle de robot à chenilles basé sur Raspberry Pi avec inter
 
 ![Robot](assets/image.png)
 
+![Robot](assets/interface.png)
+
 ## Description
 
 RobotChenilles est un projet de robot télécommandé composé de :
