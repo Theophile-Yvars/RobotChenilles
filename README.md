@@ -1,8 +1,8 @@
-# RobotChenilles 🤖
+# RobotChenilles 
 
 Un système de contrôle de robot à chenilles basé sur Raspberry Pi avec interface web en temps réel.
 
-## 📋 Description
+## Description
 
 RobotChenilles est un projet de robot télécommandé composé de :
 - Un backend Flask Python qui contrôle les moteurs, la caméra et les capteurs via GPIO
@@ -10,7 +10,7 @@ RobotChenilles est un projet de robot télécommandé composé de :
 - Streaming vidéo en temps réel avec contrôle de l'orientation de la caméra
 - Monitoring de température via capteur DS18B20
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 RobotChenilles/
@@ -27,7 +27,7 @@ RobotChenilles/
     └── ...
 ```
 
-## 🛠️ Prérequis
+## Prérequis
 
 ### Hardware
 - Raspberry Pi (testé sur Pi 3/4)
@@ -43,7 +43,7 @@ RobotChenilles/
 - Node.js 16+
 - Docker (optionnel, pour déploiement)
 
-## 🚀 Installation
+## Installation
 
 ### Backend (sur Raspberry Pi)
 
@@ -79,7 +79,7 @@ npm install
    - Modifier l'IP du backend dans `src/components/Command.js` et `src/components/Camera.js`
    - Par défaut configuré pour `192.168.1.127:5000`
 
-## 🎮 Utilisation
+## Utilisation
 
 ### Démarrage en développement
 
@@ -130,7 +130,7 @@ Raspberry Pi
 └── 1-Wire → Capteur DS18B20
 ```
 
-## 🌐 API Endpoints
+## API Endpoints
 
 | Endpoint | Méthode | Description |
 |----------|---------|-------------|
@@ -140,7 +140,7 @@ Raspberry Pi
 | `/cam_down` | GET | Baisser la caméra |
 | `/temperature` | GET | Lecture température |
 
-## 🐛 Dépannage
+## Dépannage
 
 ### Problèmes courants
 
@@ -166,7 +166,7 @@ sudo journalctl -u robot-backend.service -f
 bash backend/read_temp.sh
 ```
 
-## 📝 Développement
+## Développement
 
 ### Structure du code
 - **Backend modulaire** : Séparation motors/camera/temperature
@@ -182,22 +182,3 @@ cd frontend && npm test
 # Test backend (manuel)
 cd backend && python3 -c "from motors import forward; forward()"
 ```
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/nouvelle-fonctionnalite`)
-3. Commit les changements (`git commit -am 'Ajout nouvelle fonctionnalité'`)
-4. Push vers la branche (`git push origin feature/nouvelle-fonctionnalite`)
-5. Créer une Pull Request
-
-## 📄 Licence
-
-Ce projet est sous licence [MIT](LICENSE) - voir le fichier LICENSE pour plus de détails.
-
-## 📞 Support
-
-Pour toute question ou problème :
-- Ouvrir une issue sur GitHub
-- Consulter la documentation hardware Raspberry Pi
-- Vérifier les logs système et service
