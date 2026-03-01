@@ -114,7 +114,7 @@ bash build.sh
 docker stack deploy -c docker-compose.yml myrobot
 ```
 
-## 🔧 Configuration Hardware
+## Configuration Hardware
 
 ### Brochage GPIO
 
