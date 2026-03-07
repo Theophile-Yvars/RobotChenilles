@@ -1,0 +1,121 @@
+.robot-stats-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.robot-stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.stats-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f8f9fa;
+}
+
+.stats-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.stats-icon {
+  font-size: 1.5rem;
+}
+
+.stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+  background: linear-gradient(135deg, #e9ecef, #dee2e6);
+  transform: translateX(4px);
+}
+
+.stat-icon {
+  font-size: 1.2rem;
+  width: 24px;
+  text-align: center;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #6c757d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+/* Animations pour les valeurs qui changent */
+.stat-value {
+  transition: all 0.3s ease;
+}
+
+.stat-value:hover {
+  color: #667eea;
+}
+
+/* Styles spécifiques pour certaines stats */
+.stat-item:first-child .stat-value {
+  color: #27ae60;
+}
+
+.stat-item:nth-child(2) .stat-value {
+  color: #3498db;
+}
+
+.stat-item:last-child .stat-value {
+  color: #e67e22;
+}
+
+@media (max-width: 768px) {
+  .robot-stats-card {
+    padding: 1rem;
+  }
+  
+  .stats-grid {
+    gap: 0.75rem;
+  }
+  
+  .stat-item {
+    padding: 0.5rem;
+  }
+  
+  .stat-content {
+    gap: 0.125rem;
+  }
+}

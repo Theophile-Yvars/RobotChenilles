@@ -21,7 +21,7 @@ def generate_launch_description():
             executable='brain_node',
             name='brain'
         ),
-        # 4. Lancer le Pont Web (Socket pour ton React)
+        # 4. Lancer le Pont Web (Socket pour React)
         Node(
             package='rosbridge_server',
             executable='rosbridge_websocket',
