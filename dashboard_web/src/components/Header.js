@@ -6,9 +6,8 @@ function Header() {
     <header className="app-header">
       <div className="header-content">
         <div className="logo-section">
-          <div className="robot-icon">🤖</div>
           <div className="title-section">
-            <h1>RobotChenilles</h1>
+            <h1>Robot Chenilles</h1>
             <p className="subtitle">Contrôle à distance</p>
           </div>
         </div>

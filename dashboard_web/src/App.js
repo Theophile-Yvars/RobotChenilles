@@ -1,74 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./App.css";
-import Camera from "./components/Camera";
-import Temperature from "./components/Temperature";
-import Command from "./components/Command";
-import ConnectionStatus from "./components/ConnectionStatus";
-import RobotStats from "./components/RobotStats";
+// On garde tes composants de structure
 import Header from "./components/Header";
+import Camera from "./components/Camera";
+import RobotStats from "./components/RobotStats";
+// On utilise le nouveau Dashboard qui gère la logique ROS 2
+import RobotDashboard from "./components/RobotDashboard";
 
 function App() {
-  const [isConnected, setIsConnected] = useState(false);
+  // On garde un état pour les stats (optionnel, selon tes besoins)
   const [robotStats, setRobotStats] = useState({
-    lastCommand: 'stop',
+    lastCommand: 'Arrêt',
     commandCount: 0,
     uptime: 0
   });
 
-  // Test de connexion au backend
-  useEffect(() => {
-    const testConnection = () => {
-      fetch('http://192.168.1.127:5000/temperature')
-        .then(response => {
-          setIsConnected(response.ok);
-        })
-        .catch(() => {
-          setIsConnected(false);
-        });
-    };
-
-    testConnection();
-    const interval = setInterval(testConnection, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Compteur d'uptime
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRobotStats(prev => ({ ...prev, uptime: prev.uptime + 1 }));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const updateStats = (command) => {
-    setRobotStats(prev => ({
-      ...prev,
-      lastCommand: command,
-      commandCount: prev.commandCount + 1
-    }));
-  };
-
   return (
     <div className="App">
       <Header />
-      <ConnectionStatus isConnected={isConnected} />
       
       <main className="main-content">
         <div className="dashboard-grid">
+          
+          {/* Colonne Gauche : Vision et Stats */}
           <div className="video-panel">
             <Camera />
+            <div className="stats-section" style={{marginTop: '20px'}}>
+               <RobotStats stats={robotStats} />
+            </div>
           </div>
           
+          {/* Colonne Droite : Contrôles et Température */}
           <div className="control-panel">
-            <div className="stats-section">
-              <Temperature />
-              <RobotStats stats={robotStats} />
-            </div>
-            
             <div className="command-section">
-              <Command onCommand={updateStats} isConnected={isConnected} />
+              <RobotDashboard />
             </div>
           </div>
+
         </div>
       </main>
     </div>

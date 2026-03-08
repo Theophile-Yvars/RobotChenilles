@@ -44,7 +44,6 @@ function RobotStats({ stats }) {
     <div className="robot-stats-card">
       <div className="stats-header">
         <h3>Statistiques</h3>
-        <div className="stats-icon">📊</div>
       </div>
       
       <div className="stats-grid">

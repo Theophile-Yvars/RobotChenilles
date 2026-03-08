@@ -1,0 +1,109 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  padding: 20px;
+}
+
+/* État de connexion */
+.status-bar {
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  border-radius: 50px;
+  width: fit-content;
+  text-transform: uppercase;
+}
+
+.status-bar.connecté { color: #2ed573; border: 1px solid #2ed573; box-shadow: 0 0 10px rgba(46, 213, 115, 0.2); }
+.status-bar.déconnecté { color: var(--neon-red); border: 1px solid var(--neon-red); }
+
+/* Carte Température */
+.temp-card {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 20px;
+  border-radius: 15px;
+  border-left: 4px solid var(--neon-blue);
+  width: 100%;
+  max-width: 300px;
+}
+
+.temp-card.danger {
+  border-color: var(--neon-red);
+  animation: pulse 1s infinite;
+}
+
+.temp-value {
+  font-size: 2.5rem;
+  font-weight: 200;
+  color: var(--neon-blue);
+  margin: 10px 0;
+}
+
+/* GRILLE DU JOYSTICK (La correction est ici) */
+.joystick-grid {
+  display: grid;
+  grid-template-areas: 
+    ".    up    ."
+    "left stop  right"
+    ".    down  .";
+  gap: 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-up    { grid-area: up; }
+.btn-left  { grid-area: left; }
+.btn-stop  { grid-area: stop; }
+.btn-right { grid-area: right; }
+.btn-down  { grid-area: down; }
+
+.joystick-grid button {
+  width: 70px;
+  height: 70px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.joystick-grid button:active {
+  transform: scale(0.9);
+  background: var(--neon-blue);
+  box-shadow: 0 0 20px var(--neon-blue);
+  border-color: #fff;
+  color: #000;
+}
+
+.btn-stop {
+  border-radius: 15px !important;
+  color: var(--neon-red) !important;
+  border-color: var(--neon-red) !important;
+  font-weight: bold;
+  font-size: 0.9rem !important;
+}
+
+.btn-stop:hover {
+  background: var(--neon-red) !important;
+  color: white !important;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.keyboard-hint {
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: #888;
+  font-style: italic;
+  opacity: 0.7;
+}
