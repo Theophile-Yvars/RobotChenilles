@@ -2,8 +2,8 @@
 <package format="3">
   <name>robot_brain</name>
   <version>0.0.1</version>
-  <description>Logique de décision et intelligence du robot</description>
-  <maintainer email="votre@email.com">Theo</maintainer>
+  <description>Cerveau décisionnel du robot</description>
+  <maintainer email="theo@robot.com">Theo</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
