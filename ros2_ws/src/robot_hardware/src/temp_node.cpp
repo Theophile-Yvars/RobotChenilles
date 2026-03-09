@@ -44,3 +44,20 @@ void TempSensorNode::read_temp()
             RCLCPP_ERROR(this->get_logger(), "Capteur non détecté à l'adresse : %s", path.c_str());
     }
 }
+
+int main(int argc, char ** argv)
+{
+  // 1. Initialise les communications ROS 2
+  rclcpp::init(argc, argv);
+
+  // 2. Crée une instance de ton Node
+  auto node = std::make_shared<BrainNode>();
+
+  // 3. Fait tourner le Node en boucle (écoute les messages, exécute le timer)
+  // Cette ligne est bloquante : le programme s'arrête ici jusqu'au Ctrl+C
+  rclcpp::spin(node);
+
+  // 4. Une fois fini, on coupe proprement
+  rclcpp::shutdown();
+  return 0;
+}
