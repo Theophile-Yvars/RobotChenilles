@@ -50,7 +50,7 @@ function RobotStats({ stats }) {
         <div className="stat-item">
           <div className="stat-icon">⏱️</div>
           <div className="stat-content">
-            <span className="stat-label">Uptime</span>
+            <span className="stat-label">Uptime  :  </span>
             <span className="stat-value">{formatUptime(stats.uptime)}</span>
           </div>
         </div>
@@ -58,7 +58,7 @@ function RobotStats({ stats }) {
         <div className="stat-item">
           <div className="stat-icon">🎮</div>
           <div className="stat-content">
-            <span className="stat-label">Commandes</span>
+            <span className="stat-label">Commandes  :  </span>
             <span className="stat-value">{stats.commandCount}</span>
           </div>
         </div>
@@ -66,7 +66,7 @@ function RobotStats({ stats }) {
         <div className="stat-item">
           <div className="stat-icon">{getCommandIcon(stats.lastCommand)}</div>
           <div className="stat-content">
-            <span className="stat-label">Dernière action</span>
+            <span className="stat-label">Dernière action  :  </span>
             <span className="stat-value">{getCommandLabel(stats.lastCommand)}</span>
           </div>
         </div>

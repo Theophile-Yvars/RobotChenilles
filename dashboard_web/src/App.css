@@ -1,42 +1,10 @@
-:root {
-  --neon-blue: #00d2ff;
-  --neon-red: #ff4757;
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-border: rgba(255, 255, 255, 0.1);
-}
-
 .App {
+  background-color: #0d1117;
   min-height: 100vh;
-  /* Fond dégradé radial très sombre */
-  background: radial-gradient(circle at center, #102027 0%, #050a0c 100%);
-  color: #e0e0e0;
-  font-family: 'Segoe UI', Roboto, sans-serif;
 }
 
 .main-content {
-  max-width: 1400px;
-  margin: 0 auto;
+  display: flex;
+  justify-content: center;
   padding: 20px;
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 25px;
-}
-
-@media (min-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: 1.5fr 1fr;
-  }
-}
-
-/* Effet Verre pour les panneaux */
-.video-panel, .command-section {
-  background: var(--glass-bg);
-  backdrop-filter: blur(15px);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px;
-  padding: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
