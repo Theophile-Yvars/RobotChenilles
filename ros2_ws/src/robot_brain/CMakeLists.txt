@@ -18,7 +18,10 @@ find_package(sensor_msgs REQUIRED) # Requis pour les images
 find_package(cv_bridge REQUIRED)   # Le pont entre ROS et OpenCV
 find_package(OpenCV REQUIRED)      # OpenCV lui-même
 
-include_directories(include)
+include_directories(
+  include
+  ${OpenCV_INCLUDE_DIRS}
+)
 
 # 2. Définir l'exécutable
 # On ne liste que brain_node.cpp puisqu'il contient maintenant le main()
