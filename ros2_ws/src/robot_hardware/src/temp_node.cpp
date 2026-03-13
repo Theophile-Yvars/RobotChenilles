@@ -4,7 +4,7 @@
 
 using namespace std::chrono_literals; // Requis pour utiliser "ms"
  
-TempSensorNode() : Node("temp_sensor_node") {
+TempSensorNode::TempSensorNode() : Node("temp_sensor_node") {
     publisher_ = this->create_publisher<std_msgs::msg::Float32>("/tempSensor", 2);
     timer_ = this->create_wall_timer(2000ms, std::bind(&TempSensorNode::read_temp, this));
     RCLCPP_INFO(this->get_logger(), "Node Température démarré.");

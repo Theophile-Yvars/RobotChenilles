@@ -1,4 +1,4 @@
-#include "robot_brain/brain_node.hpp"
+#include "robot_hardware/motor_node.hpp"
 
 using namespace std::chrono_literals;
 
