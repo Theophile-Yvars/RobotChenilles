@@ -13,13 +13,14 @@ const RobotDashboard = () => {
   });
 
   const ros = useRef(null);
-  const robotIP = "192.168.1.127";
 
-  // --- LOGIQUE DE COULEUR (Définie ici pour être accessible au JSX) ---
+  // IP DU ROBOT
+  const robotIP = "192.168.1.9";
+
   const getTempClass = (temperature) => {
-    if (temperature < 45) return "temp-low";    // Vert
-    if (temperature < 65) return "temp-med";    // Orange
-    return "temp-high";                         // Rouge
+    if (temperature < 45) return "temp-low";
+    if (temperature < 65) return "temp-med";
+    return "temp-high";
   };
 
   const sendMove = useCallback((linear, angular) => {
@@ -59,7 +60,7 @@ const RobotDashboard = () => {
     });
 
     tiltTopic.publish({ data: steps });
-    
+
     setStats(prev => ({
       ...prev,
       commandCount: prev.commandCount + 1,
@@ -68,7 +69,10 @@ const RobotDashboard = () => {
   };
 
   useEffect(() => {
-    ros.current = new Ros({ url: `ws://${robotIP}:9090` });
+
+    ros.current = new Ros({
+      url: `ws://${robotIP}:9090`
+    });
 
     ros.current.on("connection", () => setStatus("Connecté"));
     ros.current.on("error", () => setStatus("Erreur"));
@@ -79,7 +83,10 @@ const RobotDashboard = () => {
       name: "/tempSensor",
       messageType: "std_msgs/Float32",
     });
-    tempListener.subscribe((msg) => setTemp(msg.data.toFixed(1)));
+
+    tempListener.subscribe((msg) => {
+      setTemp(msg.data.toFixed(1));
+    });
 
     const uptimeTimer = setInterval(() => {
       setStats(prev => ({ ...prev, uptime: prev.uptime + 1 }));
@@ -87,18 +94,29 @@ const RobotDashboard = () => {
 
     const handleKeyDown = (e) => {
       if (e.repeat) return;
+
       switch(e.key) {
-        case "ArrowUp":    sendMove(0.5, 0); break;
-        case "ArrowDown":  sendMove(-0.5, 0); break;
-        case "ArrowLeft":  sendMove(0, 1.0); break;
-        case "ArrowRight": sendMove(0, -1.0); break;
-        default: break;
+        case "ArrowUp":
+          sendMove(0.5, 0);
+          break;
+
+        case "ArrowDown":
+          sendMove(-0.5, 0);
+          break;
+
+        case "ArrowLeft":
+          sendMove(0, 1.0);
+          break;
+
+        case "ArrowRight":
+          sendMove(0, -1.0);
+          break;
       }
     };
 
     const handleKeyUp = (e) => {
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-        sendMove(0, 0);
+      if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(e.key)) {
+        sendMove(0,0);
       }
     };
 
@@ -112,29 +130,35 @@ const RobotDashboard = () => {
       window.removeEventListener("keyup", handleKeyUp);
       ros.current.close();
     };
+
   }, [sendMove]);
 
   return (
     <div className="dashboard-container">
       <div className="dashboard-card">
-        
+
         <div className="card-header">
           <div className="status-group">
-            <span className={`status-pill ${status.toLowerCase()}`}>{status}</span>
+            <span className={`status-pill ${status.toLowerCase()}`}>
+              {status}
+            </span>
           </div>
-          {/* Utilisation de la fonction getTempClass corrigée */}
+
           <div className={`temp-badge ${getTempClass(temp)}`}>
             CPU: {temp}°C
           </div>
         </div>
 
         <div className="video-viewport">
-          <img 
-            src={`http://${robotIP}:8080/stream?topic=/image_raw`} 
+          <img
+            src={`http://${robotIP}:8080/stream?topic=/image_raw`}
             alt="Robot Stream"
             className="main-stream"
-            onError={(e) => e.target.src = "https://via.placeholder.com/640x480?text=Camera+Offline"}
+            onError={(e) =>
+              e.target.src = "https://via.placeholder.com/640x480?text=Camera+Offline"
+            }
           />
+
           <div className="tilt-overlay">
             <button className="tilt-btn" onClick={() => sendTilt(50)}>▲</button>
             <span className="tilt-label">TILT</span>
@@ -143,22 +167,63 @@ const RobotDashboard = () => {
         </div>
 
         <div className="ui-container">
+
           <div className="stats-wrapper">
             <RobotStats stats={stats} />
           </div>
 
           <div className="controls-wrapper">
+
             <div className="d-pad">
-              <button className="up" onMouseDown={() => sendMove(0.5, 0)} onMouseUp={() => sendMove(0, 0)}>▲</button>
+
+              <button
+                className="up"
+                onMouseDown={() => sendMove(0.5, 0)}
+                onMouseUp={() => sendMove(0, 0)}
+              >
+                ▲
+              </button>
+
               <div className="mid-row">
-                <button className="left" onMouseDown={() => sendMove(0, 1.0)} onMouseUp={() => sendMove(0, 0)}>◀</button>
-                <button className="stop" onClick={() => sendMove(0, 0)}>STOP</button>
-                <button className="right" onMouseDown={() => sendMove(0, -1.0)} onMouseUp={() => sendMove(0, 0)}>▶</button>
+
+                <button
+                  className="left"
+                  onMouseDown={() => sendMove(0, 1.0)}
+                  onMouseUp={() => sendMove(0, 0)}
+                >
+                  ◀
+                </button>
+
+                <button
+                  className="stop"
+                  onClick={() => sendMove(0, 0)}
+                >
+                  STOP
+                </button>
+
+                <button
+                  className="right"
+                  onMouseDown={() => sendMove(0, -1.0)}
+                  onMouseUp={() => sendMove(0, 0)}
+                >
+                  ▶
+                </button>
+
               </div>
-              <button className="down" onMouseDown={() => sendMove(-0.5, 0)} onMouseUp={() => sendMove(0, 0)}>▼</button>
+
+              <button
+                className="down"
+                onMouseDown={() => sendMove(-0.5, 0)}
+                onMouseUp={() => sendMove(0, 0)}
+              >
+                ▼
+              </button>
+
             </div>
+
           </div>
         </div>
+
       </div>
     </div>
   );
