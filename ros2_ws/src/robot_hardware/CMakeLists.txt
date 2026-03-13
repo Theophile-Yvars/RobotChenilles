@@ -18,12 +18,18 @@ ament_target_dependencies(motor_node rclcpp std_msgs geometry_msgs)
 add_executable(temp_node src/temp_node.cpp)
 ament_target_dependencies(temp_node rclcpp std_msgs)
 
-# 5. Installation (pour que 'ros2 run' trouve les fichiers après le build)
+# 5. Installation des binaires C++
 install(TARGETS
   motor_node
   temp_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# 6. Fin de configuration ROS 2
+# 6. Installation du script PYTHON
+install(PROGRAMS
+  src/camera_stepper_node.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# 7. Fin de configuration ROS 2
 ament_package()
