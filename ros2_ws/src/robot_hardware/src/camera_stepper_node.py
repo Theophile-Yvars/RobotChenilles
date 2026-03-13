@@ -3,24 +3,33 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int32
 import time
+import sys
 
-# Sur Pi 5, on préfère gpiozero ou lgpio
+# Gestion de l'import pour Pi 5
 try:
     import RPi.GPIO as GPIO
 except ImportError:
-    print("Erreur : RPi.GPIO n'est pas compatible Pi 5 ou manquant.")
+    try:
+        # Alternative moderne pour Pi 5
+        import rpi_lgpio as GPIO
+    except ImportError:
+        print("CRITICAL: Aucune librairie GPIO trouvée. Installez python3-lgpio")
+        sys.exit(1)
 
 class CameraStepperNode(Node):
     def __init__(self):
-        super().__init__('camera_stepper')
+        super().__init__('camera_tilt') # Nom cohérent avec ton launch file
         
-        # Configuration GPIO (Pins 14, 15, 18, 23)
         self.step_pins = [14, 15, 18, 23]
         
-        GPIO.setmode(GPIO.BCM)
-        for pin in self.step_pins:
-            GPIO.setup(pin, GPIO.OUT)
-            GPIO.output(pin, False)
+        # Initialisation GPIO
+        try:
+            GPIO.setmode(GPIO.BCM)
+            for pin in self.step_pins:
+                GPIO.setup(pin, GPIO.OUT)
+                GPIO.output(pin, False)
+        except Exception as e:
+            self.get_logger().error(f"Erreur GPIO Hardware : {e}")
 
         self.step_sequence = [
             [1, 0, 0, 0], [1, 1, 0, 0], [0, 1, 0, 0], [0, 1, 1, 0],
@@ -33,12 +42,12 @@ class CameraStepperNode(Node):
             self.listener_callback,
             10)
         
-        self.get_logger().info("Node Moteur Pas à Pas Camera prêt (Pi 5).")
+        self.get_logger().info("Node Stepper Camera opérationnel sur Pi 5.")
 
     def move_steps(self, steps):
         direction = 1 if steps > 0 else -1
         abs_steps = abs(steps)
-        delay = 0.002 # Vitesse de rotation
+        delay = 0.002
 
         for _ in range(abs_steps):
             seq = range(8) if direction == 1 else reversed(range(8))
@@ -47,12 +56,12 @@ class CameraStepperNode(Node):
                     GPIO.output(self.step_pins[pin_idx], self.step_sequence[step_idx][pin_idx])
                 time.sleep(delay)
         
-        # Stop courant pour éviter la chauffe
+        # Relâcher la tension
         for pin in self.step_pins:
             GPIO.output(pin, False)
 
     def listener_callback(self, msg):
-        self.get_logger().info(f"Mouvement camera : {msg.data} pas")
+        self.get_logger().info(f"Mouvement : {msg.data} pas")
         self.move_steps(msg.data)
 
 def main(args=None):
@@ -63,7 +72,11 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        GPIO.cleanup()
+        # Sécurité : on éteint tout avant de quitter
+        try:
+            GPIO.cleanup()
+        except:
+            pass
         node.destroy_node()
         rclpy.shutdown()
 
