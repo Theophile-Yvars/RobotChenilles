@@ -11,7 +11,7 @@ def generate_launch_description():
         parameters=[{
             'video_device': '/dev/video0',
             'image_size': [640, 480],
-            'pixel_format': 'BGR3'
+            'pixel_format': 'pRAA'
         }]
     )
 
