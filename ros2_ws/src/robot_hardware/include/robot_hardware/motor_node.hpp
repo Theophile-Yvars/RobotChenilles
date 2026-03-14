@@ -14,7 +14,8 @@ public:
     virtual ~MotorNode();
 
 private:
-    // Cette ligne doit être EXACTEMENT comme ça pour correspondre au .cpp
     void motor_callback(const geometry_msgs::msg::Twist::SharedPtr msg);
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
+    float linear_;
+    float angular_;
 };
