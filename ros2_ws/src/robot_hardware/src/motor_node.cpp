@@ -15,7 +15,7 @@ MotorNode::~MotorNode() {
 }
 
 void MotorNode::motor_callback(const geometry_msgs::msg::Twist::SharedPtr msg) {
-    if(linear_ != msg->linear.x && angular_ != msg->angular.z){
+    if(linear_ != msg->linear.x || angular_ != msg->angular.z){
         linear_ = msg->linear.x;
         angular_ = msg->angular.z;
         RCLCPP_INFO(this->get_logger(), "Exécution Hardware -> Linéaire: %.2f | Angulaire: %.2f", linear_, angular_);
