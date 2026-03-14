@@ -10,8 +10,7 @@ def generate_launch_description():
         name='camera',
         parameters=[{
             'video_device': '/dev/video0',
-            'image_size': [640, 480],
-            'pixel_format': 'YUYV' # Ou 'mjpeg' si supporté, pour plus de fluidité
+            'image_size': [640, 480]
         }]
     )
 
