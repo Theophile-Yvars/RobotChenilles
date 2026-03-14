@@ -8,7 +8,7 @@ def generate_launch_description():
         executable='camera_node',
         name='camera',
         parameters=[{
-            'camera': 0,      
+            'camera': 0, 
             'width': 640,
             'height': 480,
             'format': 'BGR888',
@@ -38,14 +38,12 @@ def generate_launch_description():
         package='rosbridge_server',
         executable='rosbridge_websocket',
         name='rosbridge',
-        parameters=[{
-            'port': 9090
-        }]
+        parameters=[{'port': 9090}]
     )
 
     camera_stepper = Node(
         package='robot_hardware',
-        executable='camera_stepper_node.py',
+        executable='camera_stepper_node.py', 
         name='camera_tilt'
     )
 
