@@ -10,7 +10,7 @@ def generate_launch_description():
         parameters=[{
             'video_device': '/dev/video0',
             'image_size': [640, 480],
-            'pixel_format': 'GREY', # On essaie le format le plus simple (Gris)
+            'pixel_format': 'RGB3',
             'io_method': 'mmap',
         }],
         remappings=[('/image_raw', '/image_raw')]
