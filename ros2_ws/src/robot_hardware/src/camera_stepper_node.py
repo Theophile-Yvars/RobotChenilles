@@ -22,16 +22,20 @@ class CameraStepperNode(Node):
     def move_steps(self, steps):
         direction = 1 if steps > 0 else -1
         abs_steps = abs(steps)
-        for _ in range(abs_steps):
-            seq = range(8) if direction == 1 else reversed(range(8))
-            for step_idx in seq:
-                for i in range(4):
-                    if self.step_sequence[step_idx][i]:
-                        self.pins[i].on()
-                    else:
-                        self.pins[i].off()
-                time.sleep(0.002)
-        # Éteindre tout
+        for i in range(abs_steps):
+            # On calcule l'index de la séquence (0 à 7)
+            step_idx = i % 8
+            if direction == -1:
+                step_idx = 7 - step_idx
+            
+            for pin_idx in range(4):
+                if self.step_sequence[step_idx][pin_idx]:
+                    self.pins[pin_idx].on()
+                else:
+                    self.pins[pin_idx].off()
+            time.sleep(0.002) # Vitesse de rotation
+            
+        # Éteindre pour ne pas chauffer
         for p in self.pins: p.off()
 
     def listener_callback(self, msg):
