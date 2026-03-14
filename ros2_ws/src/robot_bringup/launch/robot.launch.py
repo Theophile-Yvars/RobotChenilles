@@ -10,9 +10,8 @@ def generate_launch_description():
         parameters=[{
             'video_device': '/dev/video0',
             'image_size': [640, 480],
-            'pixel_format': 'YUYV',
+            'pixel_format': 'MJPG', # On passe de YUYV à MJPG
             'io_method': 'mmap',
-            'v4l2_buffer_count': 4,
         }],
         remappings=[('/image_raw', '/image_raw')]
     )
