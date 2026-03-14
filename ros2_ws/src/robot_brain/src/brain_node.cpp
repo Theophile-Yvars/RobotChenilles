@@ -2,6 +2,7 @@
 #include <cv_bridge/cv_bridge.hpp>
 #include <opencv2/opencv.hpp>
 #include "std_msgs/msg/int32.hpp"
+#include <sensor_msgs/image_encodings.hpp>
 
 using namespace std::chrono_literals;
 
@@ -36,15 +37,14 @@ BrainNode::BrainNode() : Node("brain_node") {
 
 void BrainNode::image_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
     try {
-        auto cv_ptr = cv_bridge::toCvCopy(msg, "bgr8");
+        auto cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
         cv::Mat frame = cv_ptr->image;
-        auto processed_msg = cv_bridge::CvImage(msg->header, "bgr8", frame).toImageMsg();
+        auto processed_msg = cv_bridge::CvImage(msg->header, sensor_msgs::image_encodings::BGR8, frame).toImageMsg();
         pub_processed_image_->publish(*processed_msg);
     } catch (cv_bridge::Exception& e) {
         RCLCPP_ERROR(this->get_logger(), "Erreur cv_bridge: %s", e.what());
     }
 }
-
 void BrainNode::decision_loop() {
     geometry_msgs::msg::Twist final_cmd;
 
