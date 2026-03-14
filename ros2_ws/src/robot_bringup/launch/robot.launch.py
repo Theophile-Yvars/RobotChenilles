@@ -8,9 +8,10 @@ def generate_launch_description():
         executable='camera_node',
         name='camera',
         parameters=[{
+            'camera': 0,
             'width': 640,
             'height': 480,
-            'format': 'BGR888',
+            'role': 'video', # Aide le pisp.cpp à choisir le bon stream
         }]
     )
 
