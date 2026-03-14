@@ -3,6 +3,7 @@
 # Configuration ROS 2 forcée en local
 export ROS_DOMAIN_ID=0
 export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
+export LIBCAMERA_IPA_MODULE_PATH=/opt/ros/jazzy/lib/libcamera/ipa
 # On désactive le fichier XML qui posait erreur
 unset FASTRTPS_DEFAULT_PROFILES_FILE
 
