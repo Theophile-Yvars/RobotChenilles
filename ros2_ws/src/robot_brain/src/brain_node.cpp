@@ -22,7 +22,7 @@ BrainNode::BrainNode() : Node("brain_node") {
             this->web_cmd_ = *msg;
         });
     sub_image_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "/image_raw", rclcpp::SensorDataQoS(), 
+        "/camera/image_raw", rclcpp::SensorDataQoS(), 
         std::bind(&BrainNode::image_callback, this, std::placeholders::_1));
     sub_cam_web_ = this->create_subscription<std_msgs::msg::Int32>(
         "/cam_control_web", 10, [this](const std_msgs::msg::Int32::SharedPtr msg) {

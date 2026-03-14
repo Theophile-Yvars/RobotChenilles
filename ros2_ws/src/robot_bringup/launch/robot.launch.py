@@ -4,11 +4,13 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     camera = Node(
-        package='v4l2_camera',
-        executable='v4l2_camera_node',
+        package='camera_ros',
+        executable='camera_node',
         name='camera',
         parameters=[{
-            'video_device': '/dev/video0',
+            'width': 640,
+            'height': 480,
+            'format': 'BGR888',
         }]
     )
 
