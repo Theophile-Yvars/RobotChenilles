@@ -22,7 +22,7 @@ BrainNode::BrainNode() : Node("brain_node") {
             this->web_cmd_ = *msg;
         });
     sub_image_ = this->create_subscription<sensor_msgs::msg::Image>(
-        "/camera/image_raw", rclcpp::SensorDataQoS(), 
+        "/camera/image_raw", 10, 
         std::bind(&BrainNode::image_callback, this, std::placeholders::_1));
     sub_cam_web_ = this->create_subscription<std_msgs::msg::Int32>(
         "/cam_control_web", 10, [this](const std_msgs::msg::Int32::SharedPtr msg) {
@@ -36,9 +36,23 @@ BrainNode::BrainNode() : Node("brain_node") {
 }
 
 void BrainNode::image_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
-    // TODO : modification avec cv_bridge. Exemple: mettre la température sur l'image 
-    pub_processed_image_->publish(*msg);
+    try {
+        // 1. Conversion du message ROS en image OpenCV
+        cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+
+        // 2. Dessiner la température en haut à gauche
+        std::string temp_text = "Temp: " + std::to_string((int)this->current_temp_) + " C";
+        cv::putText(cv_ptr->image, temp_text, cv::Point(30, 50), 
+                    cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 255, 0), 2);
+
+        // 3. Publier l'image modifiée
+        pub_processed_image_->publish(*cv_ptr->toImageMsg());
+        
+    } catch (cv_bridge::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Erreur conversion cv_bridge: %s", e.what());
+    }
 }
+
 void BrainNode::decision_loop() {
     geometry_msgs::msg::Twist final_cmd;
 
