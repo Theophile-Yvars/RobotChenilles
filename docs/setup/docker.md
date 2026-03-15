@@ -18,6 +18,18 @@ source install/setup.bash
 
 docker run -it --name robotchenilles \
   --privileged \
+  --net=host \
   -v /dev:/dev \
+  -v /sys:/sys \
+  -v /run/udev:/run/udev:ro \
+  -v /usr/share/libcamera:/usr/share/libcamera:ro \
   -v ~/robot_ws:/home/robot_ws \
   ros:jazzy
+
+
+  apt update && apt install -y python3-colcon-common-extensions python3-rosdep python3-gpiozero python3-lgpio ros-jazzy-cv-bridge ros-jazzy-vision-msgs ros-jazzy-rosbridge-suite ros-jazzy-camera-ros ros-jazzy-web-video-server
+
+  cd /home/robot_ws
+colcon build --symlink-install
+source install/setup.bash
+./src/launcher.sh
