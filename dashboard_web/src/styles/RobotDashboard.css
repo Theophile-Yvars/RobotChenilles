@@ -1,0 +1,218 @@
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  width: 100%;
+  background-color: #0d1117;
+  min-height: 80vh;
+}
+
+.dashboard-card {
+  display: flex;
+  flex-direction: column;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 1100px; /* On augmente la largeur max */
+  overflow: hidden;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 25px;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid #30363d;
+}
+
+/* --- DISPOSITION MAIN (Vidéo à gauche, UI à droite) --- */
+.video-viewport {
+  position: relative;
+  flex: 2; /* Prend plus de place */
+  background: #000;
+  min-height: 400px;
+}
+
+.main-stream {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ui-container {
+  display: flex;
+  flex-direction: row; /* Aligne Stats et Joystick côte à côte */
+  padding: 25px;
+  gap: 30px;
+  background: #0d1117;
+  border-top: 1px solid #30363d;
+}
+
+.stats-wrapper {
+  flex: 1;
+}
+
+.controls-wrapper {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- TILT OVERLAY (Sur la vidéo) --- */
+.tilt-overlay {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(0,0,0,0.5);
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.tilt-btn {
+  width: 45px;
+  height: 45px;
+  background: #21262d;
+  border: 1px solid #58a6ff;
+  color: #58a6ff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* --- JOYSTICK (D-PAD) --- */
+.d-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.mid-row {
+  display: flex;
+  gap: 8px;
+}
+
+.d-pad button {
+  width: 55px;
+  height: 55px;
+  background: #21262d;
+  border: 1px solid #30363d;
+  color: white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.d-pad .stop {
+  border-radius: 8px;
+  color: #ff7b72;
+  border-color: #ff7b72;
+  font-weight: bold;
+}
+
+/* --- BADGES --- */
+.status-pill {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  border: 1px solid #ff7b72;
+  color: #ff7b72;
+}
+.status-pill.connecté {
+  border-color: #3fb950;
+  color: #3fb950;
+}
+
+/* Effet sur les flèches du Joystick et le STOP */
+.d-pad button {
+  transition: all 0.1s ease; /* Transition fluide */
+  box-shadow: 0 4px 0px #12151a; /* Ombre pour l'effet 3D */
+}
+
+.d-pad button:hover {
+  background: #30363d;
+  border-color: var(--accent-blue);
+}
+
+.d-pad button:active {
+  transform: translateY(3px); /* Le bouton s'enfonce */
+  box-shadow: 0 1px 0px #12151a;
+  background: #58a6ff !important; /* Devient bleu au clic */
+  color: #0d1117;
+}
+
+/* Cas particulier du bouton STOP */
+.d-pad .stop:active {
+  background: #ff7b72 !important;
+  color: #0d1117;
+  border-color: #ff7b72;
+}
+
+/* Effet sur les boutons TILT (sur la vidéo) */
+.tilt-btn {
+  transition: all 0.1s ease;
+}
+
+.tilt-btn:active {
+  background: #58a6ff;
+  color: white;
+  transform: scale(0.9); /* Petit effet de rétrécissement */
+}
+
+/* État Froid / Normal (Vert) */
+.temp-badge.temp-low {
+  color: #3fb950;
+  border: 1px solid #3fb950;
+  background: rgba(63, 185, 80, 0.1);
+}
+
+/* État Chaud (Orange) */
+.temp-badge.temp-med {
+  color: #d29922;
+  border: 1px solid #d29922;
+  background: rgba(210, 153, 34, 0.1);
+}
+
+/* État Critique (Rouge + Animation) */
+.temp-badge.temp-high {
+  color: #f85149;
+  border: 1px solid #f85149;
+  background: rgba(248, 81, 73, 0.1);
+  animation: pulse-red 1.5s infinite;
+  font-weight: bold;
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(248, 81, 73, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(248, 81, 73, 0); }
+}
+
+/* Animation douce pour le passage des couleurs de température */
+.temp-badge {
+  transition: all 0.5s ease;
+  padding: 5px 15px;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* On s'assure que le conteneur des stats et du pad est bien aligné */
+.ui-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Deux colonnes égales */
+  align-items: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* Amélioration du D-Pad pour éviter qu'il ne bouge */
+.controls-wrapper {
+  display: flex;
+  justify-content: center;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}

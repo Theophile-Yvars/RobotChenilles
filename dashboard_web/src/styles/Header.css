@@ -1,0 +1,26 @@
+.app-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--glass-border);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.title-section h1 {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 1.8rem;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+}
+
+.subtitle {
+  color: var(--neon-blue);
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: #888;
+}
+
+.indicator-label {
+  font-size: 0.75rem;
+  color: #58a6ff;
+  margin-right: 8px;
+}
