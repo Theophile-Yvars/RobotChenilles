@@ -1,7 +1,5 @@
 #!/bin/bash
 
-docker build -t robot-jazzy-pi5 .
-
 # 0. Nettoyage au cas où un vieux container traîne
 docker rm -f robotchenilles 2>/dev/null
 
