@@ -10,3 +10,11 @@
   filter: contrast(1.1) brightness(0.9); /* Donne un look plus "caméra de surveillance" */
   border: 1px solid var(--glass-border);
 }
+
+.video-section img {
+  width: 100%;
+  height: auto;
+  display: block;
+  min-height: 200px; /* Pour forcer l'affichage */
+  background-color: #333; /* Pour voir si le cadre existe */
+}

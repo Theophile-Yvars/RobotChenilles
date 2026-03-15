@@ -150,14 +150,7 @@ const RobotDashboard = () => {
         </div>
 
         <div className="video-viewport">
-          <img
-            src={`http://${robotIP}:8080/stream?topic=/image_raw`}
-            alt="Robot Stream"
-            className="main-stream"
-            onError={(e) =>
-              e.target.src = "https://via.placeholder.com/640x480?text=Camera+Offline"
-            }
-          />
+          <Camera robotIP={robotIP} />
 
           <div className="tilt-overlay">
             <button className="tilt-btn" onClick={() => sendTilt(50)}>▲</button>
