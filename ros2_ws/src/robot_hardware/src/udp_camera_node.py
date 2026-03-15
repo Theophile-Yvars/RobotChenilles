@@ -13,10 +13,18 @@ class UdpCameraNode(Node):
         self.bridge = CvBridge()
         
         # Le pipeline GStreamer pour recevoir le MJPEG de l'hôte
-        pipeline = "udpsrc port=5000 ! jpegdec ! videoconvert ! appsink"
+        # On ajoute 'buffer-size' pour que l'OS ne sature pas sur les paquets UDP
+        pipeline = (
+            "udpsrc port=5000 buffer-size=524288 ! "
+            "jpegdec ! "
+            "videoconvert ! "
+            "video/x-raw,format=BGR ! "
+            "appsink drop=true max-buffers=1 sync=false"
+        )
+
         self.cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
         
-        self.timer = self.create_timer(1.0/30, self.timer_callback)
+        self.timer = self.create_timer(1.0/60, self.timer_callback)
         self.get_logger().info('Nœud Caméra UDP démarré (écoute port 5000)')
 
     def timer_callback(self):
