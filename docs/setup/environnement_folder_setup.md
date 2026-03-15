@@ -44,3 +44,66 @@ echo "source ~/RobotChenilles/ros2_ws/install/setup.bash" >> ~/.bashrc
 # Application immédiate
 source ~/.bashrc
 ```
+
+
+
+1. Installe Miniforge (le moteur de l'environnement) :
+
+Bash
+curl -L https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh -o miniforge.sh
+bash miniforge.sh -b -p $HOME/miniforge
+~/miniforge/bin/conda init bash
+source ~/.bashrc
+2. Crée l'environnement ROS 2 Humble :
+
+Bash
+conda create -n ros_env ros-humble-desktop python=3.10 -c robostack-humble -c conda-forge --no-channel-priority -y
+conda activate ros_env
+3. Installe les briques de ton robot dans cet environnement :
+
+Bash
+conda install ros-humble-cv-bridge ros-humble-rosbridge-suite ros-humble-vision-msgs -c robostack-humble -y
+4. Compile ton projet :
+
+Bash
+cd ~/robot_ws
+# On nettoie les vieux essais ratés
+rm -rf build install log
+# On build proprement
+colcon build --symlink-install
+📸 Le point crucial : Ta caméra (Encore !)
+
+
+
+Preparing transaction: done
+Verifying transaction: done
+Executing transaction: -
+/
+\
+done
+#
+# To activate this environment, use
+#
+#     $ conda activate ros_env
+#
+# To deactivate an active environment, use
+#
+#     $ conda deactivate
+
+(base) yvars@yvars:~/robot_ws $
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

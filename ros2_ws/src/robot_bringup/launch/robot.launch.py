@@ -4,15 +4,9 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     camera = Node(
-        package='camera_ros',
-        executable='camera_node',
-        name='camera',
-        parameters=[{
-            'camera': 0,
-            'width': 640,
-            'height': 480,
-            'role': 'video', # Aide le pisp.cpp à choisir le bon stream
-        }]
+        package='robot_hardware', 
+        executable='udp_camera_node.py', 
+        name='camera'
     )
 
     motors = Node(

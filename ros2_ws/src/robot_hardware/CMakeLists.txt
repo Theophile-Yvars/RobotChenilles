@@ -25,9 +25,10 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# 6. Installation du script PYTHON
+# 6. Installation des scripts PYTHON
 install(PROGRAMS
   src/camera_stepper_node.py
+  src/udp_camera_node.py       
   DESTINATION lib/${PROJECT_NAME}
 )
 
