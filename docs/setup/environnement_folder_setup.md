@@ -7,8 +7,8 @@ Le projet utilise la structure standard de ROS 2. Nous allons cloner ton dépôt
 
 ```bash
 # Création du dossier racine
-mkdir -p ~/RobotChenilles/ros2_ws/src
-cd ~/RobotChenilles/ros2_ws/src
+mkdir -p ~/robot_ws/src
+cd ~/robot_ws/src
 # Clonage du projet
 git clone https://github.com/Theophile-Yvars/RobotChenilles.git .
 ```
@@ -18,7 +18,7 @@ git clone https://github.com/Theophile-Yvars/RobotChenilles.git .
 Avant de compiler, il faut s'assurer que toutes les bibliothèques C++ et Python nécessaires sont présentes.
 
 ```bash
-cd ~/RobotChenilles/ros2_ws/
+cd ~/robot_ws/src
 sudo rosdep init
 rosdep update
 rosdep install --from-paths src --ignore-src -r -y
@@ -28,7 +28,7 @@ rosdep install --from-paths src --ignore-src -r -y
 La Raspberry Pi 5 possède 4 cœurs performants. On utilise le flag --parallel-workers pour accélérer la compilation et --symlink-install pour éviter de recompiler à chaque modification de script Python ou de fichier Launch.
 
 ```bash
-# Depuis ~/RobotChenilles/ros2_ws/
+# Depuis ~/robot_ws/src
 colcon build --symlink-install --parallel-workers 4
 ```
 
