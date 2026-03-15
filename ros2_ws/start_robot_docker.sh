@@ -38,8 +38,12 @@ docker exec robotchenilles sh -c "echo '/host_libs' > /etc/ld.so.conf.d/host.con
 
 # --- 4. Launch ROS 2 ---
 echo "--- Lancement de ROS 2 ---"
-# Note : J'ai enlevé le build.sh pour aller plus vite, rajoute-le si nécessaire
-docker exec -it robotchenilles bash -c "source /home/robot_ws/install/setup.bash && /home/robot_ws/src/launcher.sh"
+docker exec -it robotchenilles bash -c "
+    cd /home/robot_ws && \
+    /home/robot_ws/src/build.sh && \
+    source install/setup.bash && \
+    /home/robot_ws/src/launcher.sh
+"
 
 # Si on sort du docker exec, on lance le cleanup
 cleanup

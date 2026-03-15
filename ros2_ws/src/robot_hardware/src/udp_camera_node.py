@@ -36,6 +36,7 @@ class UdpCameraNode(Node):
             frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
             if frame is not None:
+                frame = cv2.flip(frame, -1)
                 msg = self.bridge.cv2_to_imgmsg(frame, encoding="bgr8")
                 msg.header.stamp = self.get_clock().now().to_msg()
                 msg.header.frame_id = "camera_frame"
