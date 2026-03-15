@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Ros, Topic } from "roslib"; 
 import RobotStats from "./RobotStats";
 import "../styles/RobotDashboard.css";
+import Camera from "./Camera";
 
 const RobotDashboard = () => {
   const [status, setStatus] = useState("Déconnecté");
