@@ -1,23 +1,21 @@
 #!/bin/bash
 
-# Configuration ROS 2 forcée en local
+# 1. Configuration ROS 2
 export ROS_DOMAIN_ID=0
 export ROS_AUTOMATIC_DISCOVERY_RANGE=LOCALHOST
-export LIBCAMERA_IPA_MODULE_PATH=/opt/ros/jazzy/lib/libcamera/ipa
-# On désactive le fichier XML qui posait erreur
-unset FASTRTPS_DEFAULT_PROFILES_FILE
+# Chemin ajusté pour l'environnement Ubuntu Noble de Docker
+export LIBCAMERA_IPA_MODULE_PATH=/usr/lib/aarch64-linux-gnu/libcamera
 
-echo "--- Nettoyage du port 9090 ---"
-sudo fuser -k 9090/tcp 2>/dev/null
-PID_9090=$(sudo lsof -t -i:9090)
-[ ! -z "$PID_9090" ] && sudo kill -9 $PID_9090 2>/dev/null
+# 2. Nettoyage (On retire sudo car on est root dans Docker)
+echo "--- Nettoyage du port 9090 (Rosbridge) ---"
+fuser -k 9090/tcp 2>/dev/null || true
 
-pkill -f camera_stepper_node.py 2>/dev/null
-sleep 2
-
+# 3. Chargement de l'environnement
+# On utilise les chemins absolus du container
 source /opt/ros/jazzy/setup.bash
-cd ~/robot_ws
+cd /home/robot_ws
 source install/setup.bash
 
 echo "--- Lancement du Robot (Moteurs + Camera + Web) ---"
-ros2 launch robot_bringup robot.launch.py
+# Utilisation de stdbuf pour voir les logs en temps réel
+stdbuf -o L ros2 launch robot_bringup robot.launch.py
