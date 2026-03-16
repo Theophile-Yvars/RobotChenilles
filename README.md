@@ -1,5 +1,9 @@
 # Robot Chenilles
 
+![Demo](assets/ihm.png)
+
+![Demo](assets/robot.png)
+
 # ROS 2 & Pi 5: Compilation & Execution Guide
 This guide summarizes the essential commands for managing your C++ nodes and Launch files on the Raspberry Pi 5
 
