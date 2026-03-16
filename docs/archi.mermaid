@@ -1,0 +1,72 @@
+graph TD
+    %% --- STYLE ---
+    classDef hw fill:#f06292,stroke:#880e4f,color:#fff;
+    classDef sw fill:#7986cb,stroke:#1a237e,color:#fff;
+    classDef web fill:#a5d6a7,stroke:#1b5e20,color:#000;
+    classDef host fill:#fff176,stroke:#fbc02d,color:#000;
+
+    %% --- PC ---
+    subgraph PC [💻 PC Dashboard]
+        UI[React App]:::web
+    end
+
+    %% --- RPi ---
+    subgraph RPi [🍓 Raspberry Pi 5]
+        
+        subgraph Hardware_In [Entrées]
+            direction LR
+            Cam[📷 OV5647 Camera]:::hw
+            Sensor[🌡️ DS18B20 Sensor]:::hw
+        end
+
+        %% --- COUCHE HOTE JUSTE SOUS CAMERA ---
+        subgraph Host_OS [🖥️ Hôte : Pi OS]
+            RpiCam[rpicam-vid]:::host
+        end
+
+        subgraph Docker [🐳 Docker Container]
+            direction TB
+            UDP_Cam[udp_camera_node]:::sw
+            Temp[temp_node]:::sw
+            Bridge[rosbridge]:::sw
+            Brain{brain_node}:::sw
+            Stream[web_video_server]:::sw
+            Motor[motor_node]:::sw
+            Stepper[camera_stepper_node]:::sw
+        end
+
+        subgraph Hardware_Out [Sorties]
+            direction LR
+            L298N[⚙️ L298N Motors]:::hw
+            StepM[🔄 Stepper Motor]:::hw
+        end
+    end
+
+    %% --- LIAISONS VIDEO ---
+    Cam --> RpiCam
+    RpiCam ==>|UDP Port 5000| UDP_Cam
+    UDP_Cam -->|/camera/image_raw| Brain
+
+    %% --- LIAISONS WEB ---
+    UI <-->|WebSocket 9090| Bridge
+    Stream -->|HTTP 8080| UI
+
+    %% --- FLUX INTERNE ROS 2 ---
+    Sensor -.->|Bus 1-Wire /sys| Temp
+    Temp -->|/tempSensor| Brain
+    
+    Bridge -->|/cmd_vel_web| Brain
+    Bridge -->|/cam_control_web| Brain
+    
+    Brain -- "/tempSensor" --> Bridge
+    Brain -->|/cmd_vel| Motor
+    Brain -->|/camera/tilt| Stepper
+    Brain -->|/image_processed| Stream
+
+    %% --- SORTIES PHYSIQUES ---
+    Motor -.->|lgpio| L298N
+    Stepper -.->|lgpio| StepM
+
+    %% --- STYLE SPECIFIQUE ---
+    %% style Host_OS fill:#fffde7,stroke:#fbc02d,stroke-dasharray: 5 5
+    style Brain stroke-width:3px,stroke:#1a237e
