@@ -1,11 +1,9 @@
 #!/bin/bash
 
-# Fonction pour tout arrêter proprement si on coupe le script
 cleanup() {
     echo ""
     echo "--- Arrêt de la caméra et du container ---"
     kill $CAM_PID 2>/dev/null
-    # Optionnel: docker stop robotchenilles
     exit
 }
 
@@ -16,7 +14,6 @@ trap cleanup SIGINT
 echo "--- Lancement de la caméra (Hôte) ---"
 pkill -9 rpicam-vid 2>/dev/null
 # Utilise 0.0.0.0 pour être sûr que Docker capte le flux sur l'interface host
-# Dans ton script start_robot_docker.sh sur la Pi
 rpicam-vid -t 0 --width 640 --height 480 --framerate 30 --codec mjpeg -o udp://0.0.0.0:5000 --inline --nopreview &
 CAM_PID=$!
 
@@ -45,5 +42,4 @@ docker exec -it robotchenilles bash -c "
     /home/robot_ws/src/launcher.sh
 "
 
-# Si on sort du docker exec, on lance le cleanup
 cleanup
