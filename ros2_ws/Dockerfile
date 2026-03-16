@@ -4,6 +4,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install des dépendances
 RUN apt-get update && apt-get install -y \
+    liblgpio-dev \
     libcamera-ipa \
     libcamera0.2 \
     libcamera-tools \

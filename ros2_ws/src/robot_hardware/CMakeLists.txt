@@ -7,11 +7,14 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 
+find_library(LGPIO_LIB lgpio)
+
 # 2. Déclarer le dossier des headers (.hpp)
 include_directories(include)
 
 # 3. Créer l'exécutable pour les MOTEURS
 add_executable(motor_node src/motor_node.cpp)
+target_link_libraries(motor_node ${LGPIO_LIB}) # On lie lgpio ici
 ament_target_dependencies(motor_node rclcpp std_msgs geometry_msgs)
 
 # 4. Créer l'exécutable pour la TEMPÉRATURE
