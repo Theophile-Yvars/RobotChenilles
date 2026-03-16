@@ -13,10 +13,10 @@ MotorNode::MotorNode() : Node("motor_node") {
     handle_ = lgGpiochipOpen(4); 
 
     // On réserve explicitement les 4 pins de contrôle moteur
-    lgGpioClaimOutput(handle_, 0, 5, 0);  // L_IN1
-    lgGpioClaimOutput(handle_, 0, 6, 0);  // L_IN2
-    lgGpioClaimOutput(handle_, 0, 13, 0); // R_IN1
-    lgGpioClaimOutput(handle_, 0, 26, 0); // R_IN2
+    lgGpioClaimOutput(handle_, 0, L_IN1, 0);  // L_IN1
+    lgGpioClaimOutput(handle_, 0, L_IN2, 0);  // L_IN2
+    lgGpioClaimOutput(handle_, 0, R_IN1, 0); // R_IN1
+    lgGpioClaimOutput(handle_, 0, R_IN2, 0); // R_IN2
     subscription_ = this->create_subscription<geometry_msgs::msg::Twist>(
         "/cmd_vel", 10, std::bind(&MotorNode::motor_callback, this, _1));
 
@@ -34,8 +34,8 @@ void MotorNode::motor_callback(const geometry_msgs::msg::Twist::SharedPtr msg) {
     double x = msg->linear.x;
     double z = msg->angular.z;
 
-    double left_speed = x + z;
-    double right_speed = x - z;
+    double left_speed = -z + x;  
+    double right_speed = -z - x;
 
     // --- LOGIQUE D'AFFICHAGE SÉLECTIF ---
     if (left_speed != last_left_ || right_speed != last_right_) {
