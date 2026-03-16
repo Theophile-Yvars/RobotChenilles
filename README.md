@@ -34,7 +34,9 @@ L'interface utilisateur est développée en React. Elle permet de :
 | **temp_node** | C++ | Lecture DS18B20 -> /tempSensor (Sécurité arrêt à 60°C) |
 | **motor_node** | C++| Traduction des commandes <- `/cmd_vel` vers les moteurs |
 | **camera_stepper_node** | C++ | Contrôle du moteur pas-à-pas pour l'inclinaison caméra |
-
+| **rpicam-vid** | Exécutable	| Capture native (libcamera) et envoi UDP (Port 5000) |
+| **lgpio / RP1** | Noyau Linux | Pins GPIO (Moteurs + Stepper + Capteur de température) |
+| **W1-Therm** | Bus 1-Wire | Capteur DS18B20 |
 
 # 1. Structure du Workspace sur la Pi5
 Le projet utilise la structure standard de ROS 2. Nous allons cloner ton dépôt GitHub directement dans le dossier source.
