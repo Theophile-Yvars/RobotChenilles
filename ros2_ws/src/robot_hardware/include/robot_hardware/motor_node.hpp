@@ -18,4 +18,7 @@ private:
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr subscription_;
     float linear_;
     float angular_;
+    int handle_;
+    double last_left_ = -999.0;
+    double last_right_ = -999.0;
 };
