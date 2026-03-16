@@ -1,64 +1,81 @@
-# Robot Chenilles
+# Robot Chenilles - Exploration Terrestre
+
+Ce projet présente un robot d'exploration terrestre autonome et téléopéré. Le système repose sur ROS 2 Jazzy et une Raspberry Pi 5, offrant une architecture modulaire et performante.
 
 ![Demo](assets/ihm.png)
 
 ![Demo](assets/robot.png)
 
-# ROS 2 & Pi 5: Compilation & Execution Guide
-This guide summarizes the essential commands for managing your C++ nodes and Launch files on the Raspberry Pi 5
+# Interface de Contrôle (Frontend)
+L'interface utilisateur est développée en React. Elle permet de :
 
-## Setup the Environment
+* Visualiser le flux vidéo en temps réel avec incrustation des données (température).
+* Piloter le robot via un joystick virtuel ou le clavier (↑, ↓, →, ←).
+* Incliner la caméra (Tilt) pour ajuster le champ de vision.
+* Surveiller l'état du système (température du CPU).
 
-Note: Run this in every new terminal window, or add it to your ~/.bashrc.Bash
+# Spécifications Techniques
+* Cerveau : Raspberry Pi 5 (8 Go RAM)
+* Middleware : ROS 2 Jazzy (Debian Bookworm)
+* Alimentation : Batterie LiPo 3S 11.1V.
+* Capteurs : Caméra OV5647 (Grand angle), Sonde de température DS18B20.
+* Conteneurisation : Docker (Debian Bookworm comme image de base).
+
+# Architecture
+
+![Demo](assets/archi.png)
+
+| Node | Type | Rôle Principal |
+| :--- | :--- | :--- |
+| **udp_camera_node** | Python | Envoie le flux RAW (640x480) vers /camera/image_raw |
+| **brain_node** | C++ | Analyse `/image_raw` -> `/image_processed` + `/tempSensor` |
+| **web_video_server** | Open Source | Stream HTTP (Port 8080) pour le Dashboard React |
+| **rosbridge** | Open Source | Pont WebSocket (Port 9090) pour les commandes /cmd_vel_web |
+| **temp_node** | C++ | Lecture DS18B20 -> /tempSensor (Sécurité arrêt à 60°C) |
+| **motor_node** | C++| Traduction des commandes <- `/cmd_vel` vers les moteurs |
+| **camera_stepper_node** | C++ | Contrôle du moteur pas-à-pas pour l'inclinaison caméra |
+
+
+# 1. Structure du Workspace sur la Pi5
+Le projet utilise la structure standard de ROS 2. Nous allons cloner ton dépôt GitHub directement dans le dossier source.
 
 ```bash
-# Load ROS 2 Humble/Jazzy system commands
-source /opt/ros/humble/setup.bash
+# Création du dossier racine
+mkdir -p ~/robot_ws/src
+cd ~/robot_ws/src
+# Clonage du projet
+git clone https://github.com/Theophile-Yvars/RobotChenilles.git .
 ```
+
+# 2. Docker sur la Pi5
+
+## Construire l'image sur la pi5
+
+Cette image docker est basé sur une debian avec RO2-jazzy, dans laquel il y a tous les nodes communautaire necessaire pour ce projet.
 
 ```bash
-# Load your specific robot workspace (after building)
-source ~/RobotChenilles/ros2_ws/install/setup.bash
+cd ros2_ws
+./build_image_docker.sh
 ```
 
----
+## Executer le container sur la pi5
 
-## 🏗️ 1. Compilation (Le Workflow Pro)
-*À exécuter depuis la racine du dossier `ros2_ws/`.*
+Ce script lance le container docker avec toutes les configs et init necessaire. Il build ensuite le projet et lance le ros2. 
 
-| Commande | Usage |
-| :--- | :--- |
-| `colcon build` | Compile tout le projet (lent la première fois). |
-| `colcon build --packages-select <nom>` | Compile **uniquement** le package spécifié (gain de temps). |
-| `colcon build --symlink-install` | **Indispensable :** Lie les fichiers Python/Launch. Pas besoin de recompiler après un changement de script ! |
-| `colcon build --parallel-workers 4` | Utilise les 4 cœurs du Pi 5 pour compiler plus vite. |
-| `rm -rf build/ install/ log/` | Nettoie tout pour une compilation "propre". |
+```bash
+cd ros2_ws
+./start_robot_docker.sh
+```
 
-> **Le combo ultime pour le Pi 5 :**
-> `colcon build --symlink-install --parallel-workers 4`
+## Executer le front sur votre PC
 
----
+```bash
+cd dashboard_web
+npm install
+npm start
+```
 
-## 🔌 2. Environnement (Le "Source")
-*Indispensable pour que Linux trouve tes commandes ROS.*
-
-| Commande | Quand l'utiliser ? |
-| :--- | :--- |
-| `source /opt/ros/humble/setup.bash` | Au démarrage de chaque terminal (Système). |
-| `source install/setup.bash` | Après chaque compilation réussie (Ton code). |
-
----
-
-## 🚀 3. Exécution
-| Commande | Action |
-| :--- | :--- |
-| `ros2 launch robot_bringup robot.launch.py` | Démarre tout le robot (Hardware + Brain + Web). |
-| `ros2 run robot_hardware motor_node` | Teste uniquement les moteurs en direct. |
-| `ros2 run robot_hardware temp_node` | Teste uniquement le capteur de température. |
-
----
-
-## 🔍 4. Debug & Introspection (Voir ce qui se passe)
+## 🔍 4. Debug & Introspection
 | Commande | Action |
 | :--- | :--- |
 | `ros2 node list` | Affiche tous les nodes actifs (le "cerveau" actuel). |
@@ -68,21 +85,6 @@ source ~/RobotChenilles/ros2_ws/install/setup.bash
 | `ros2 topic pub /cmd_vel geometry_msgs/msg/Twist "{...}"` | Envoie une commande manuelle aux moteurs. |
 
 ---
-
-## 💡 Astuce .bashrc (Automatisation)
-Pour éviter de taper les `source` à chaque fois, ajoute-les à la fin de ton fichier `~/.bashrc` sur ton Pi 5 :
-
-```bash
-echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
-echo "source ~/RobotChenilles/ros2_ws/install/setup.bash" >> ~/.bashrc
-```
-
-# Launch
-
-```bash
-source install/setup.bash
-ros2 launch robot_bringup robot.launch.py
-```
 
 # Video tuto
 
