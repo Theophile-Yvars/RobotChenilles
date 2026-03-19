@@ -20,7 +20,7 @@ Pour que les deux machines se "voient", elles doivent partager le même canal.
 Indispensable pour que le SLAM accepte les données du Lidar.
 
 ```bash
-ssh NAME@IP "sudo date -s '$(date +'%Y-%m-%d %H:%M:%S')'"
+ssh NAME@IP_PI "sudo date -s '$(date +'%Y-%m-%d %H:%M:%S')'"
 ```
 
 🟩 ÉTAPE B : Sur la Raspberry Pi (Docker)
