@@ -3,6 +3,7 @@ import { Ros, Topic } from "roslib";
 import RobotStats from "./RobotStats";
 import "../styles/RobotDashboard.css";
 import Camera from "./Camera";
+import RobotController from "./RobotController";
 
 const RobotDashboard = () => {
   const [status, setStatus] = useState("Déconnecté");
@@ -164,6 +165,11 @@ const RobotDashboard = () => {
 
           <div className="stats-wrapper">
             <RobotStats stats={stats} />
+            <RobotController 
+              rosConnected={status === "Connecté"} 
+              sendMove={sendMove} 
+              sendTilt={sendTilt} 
+            />
           </div>
 
           <div className="controls-wrapper">
