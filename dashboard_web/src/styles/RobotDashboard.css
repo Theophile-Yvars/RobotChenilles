@@ -41,15 +41,6 @@
   object-fit: contain;
 }
 
-.ui-container {
-  display: flex;
-  flex-direction: row; /* Aligne Stats et Joystick côte à côte */
-  padding: 25px;
-  gap: 30px;
-  background: #0d1117;
-  border-top: 1px solid #30363d;
-}
-
 .stats-wrapper {
   flex: 1;
 }
@@ -204,10 +195,11 @@
 /* On s'assure que le conteneur des stats et du pad est bien aligné */
 .ui-container {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Deux colonnes égales */
+  grid-template-columns: 1fr 1fr; 
   align-items: center;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.03);
+  background: #0d1117; /* Assortis au reste du dashboard */
+  border-top: 1px solid #30363d;
 }
 
 /* Amélioration du D-Pad pour éviter qu'il ne bouge */
@@ -215,4 +207,53 @@
   display: flex;
   justify-content: center;
   border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Nouveau conteneur pour aligner Vidéo et Carte */
+.visual-layout {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  background: #000;
+  border-bottom: 1px solid #30363d;
+  min-height: 400px;
+}
+
+.video-viewport {
+  flex: 1;
+  position: relative;
+  border-right: 1px solid #30363d;
+}
+
+/* Style pour le conteneur de la carte */
+.map-viewport {
+  flex: 1;
+  background: #1c2128;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* On s'assure que le canvas de ta carte ne déborde pas */
+.map-viewport canvas {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  width: 90%;          /* Force la largeur à prendre de la place */
+  height: auto;
+  image-rendering: pixelated; /* Garde les murs bien nets */
+  background: #1c2128;
+}
+
+/* Responsive : Si l'écran est trop petit, on empile Vidéo et Carte */
+@media (max-width: 900px) {
+  .visual-layout {
+    flex-direction: column;
+  }
+  .video-viewport {
+    border-right: none;
+    border-bottom: 1px solid #30363d;
+  }
 }

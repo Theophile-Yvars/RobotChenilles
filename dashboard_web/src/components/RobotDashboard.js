@@ -4,6 +4,7 @@ import RobotStats from "./RobotStats";
 import "../styles/RobotDashboard.css";
 import Camera from "./Camera";
 import RobotController from "./RobotController";
+import RosLidarMap from "./RosLidarMap";
 
 const RobotDashboard = () => {
   const [status, setStatus] = useState("Déconnecté");
@@ -151,13 +152,20 @@ const RobotDashboard = () => {
           </div>
         </div>
 
-        <div className="video-viewport">
-          <Camera robotIP={robotIP} />
+        {/* --- ZONE VISUELLE : Vidéo + Carte --- */}
+        <div className="visual-layout">
+          <div className="video-viewport">
+            <Camera robotIP={robotIP} />
+            <div className="tilt-overlay">
+              <button className="tilt-btn" onClick={() => sendTilt(50)}>▲</button>
+              <span className="tilt-label">TILT</span>
+              <button className="tilt-btn" onClick={() => sendTilt(-50)}>▼</button>
+            </div>
+          </div>
 
-          <div className="tilt-overlay">
-            <button className="tilt-btn" onClick={() => sendTilt(50)}>▲</button>
-            <span className="tilt-label">TILT</span>
-            <button className="tilt-btn" onClick={() => sendTilt(-50)}>▼</button>
+          <div className="map-viewport">
+             {/* On passe l'IP du robot au composant Map */}
+            <RosLidarMap rosIp={robotIP} />
           </div>
         </div>
 
