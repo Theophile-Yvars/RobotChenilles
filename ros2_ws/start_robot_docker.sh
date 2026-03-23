@@ -10,6 +10,14 @@ cleanup() {
 # Associe le signal Ctrl+C à la fonction cleanup
 trap cleanup SIGINT
 
+# --- 0. Synchronisation du Temps (Crucial pour le SLAM) ---
+echo "--- Synchronisation de l'horloge système ---"
+# On essaie de forcer une mise à jour via le réseau si disponible
+sudo systemctl restart systemd-timesyncd 2>/dev/null
+# On attend 2 secondes que le temps se stabilise
+sleep 2
+echo "Heure actuelle : $(date)"
+
 # --- 1. Caméra ---
 echo "--- Lancement de la caméra (Hôte) ---"
 pkill -9 rpicam-vid 2>/dev/null
@@ -28,6 +36,8 @@ docker run -dt --name robotchenilles \
   -v /usr/bin:/host_bins:ro \
   -v /usr/share/libcamera:/usr/share/libcamera:ro \
   -v ~/robot_ws:/home/robot_ws \
+  -v /etc/timezone:/etc/timezone:ro \
+  -v /etc/localtime:/etc/localtime:ro \
   robot-jazzy-pi5
 
 # --- 3. Hardware link ---
