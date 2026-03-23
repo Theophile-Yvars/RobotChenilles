@@ -1,0 +1,88 @@
+graph TD
+    %% --- STYLE ---
+    classDef hw fill:#f06292,stroke:#880e4f,color:#fff;
+    classDef sw fill:#7986cb,stroke:#1a237e,color:#fff;
+    classDef web fill:#a5d6a7,stroke:#1b5e20,color:#000;
+    classDef host fill:#fff176,stroke:#fbc02d,color:#000;
+    classDef brain fill:#5c6bc0,stroke:#1a237e,stroke-width:3px,color:#fff;
+
+    %% --- EXTERNE ---
+    subgraph PC [💻 Dashboard]
+        UI[React App]:::web
+    end
+
+    %% --- RASPBERRY PI 5 ---
+    subgraph RPi [🍓 Raspberry Pi 5]
+        
+        subgraph Hardware_In [Entrées]
+            direction LR
+            Cam[📷 OV5647]:::hw
+            Lidar[📡 Lidar LD19]:::hw
+            Temp_S[🌡️ DS18B20]:::hw
+        end
+
+        subgraph Host [🖥️ Hôte : Pi OS]
+            RpiCam[rpicam-vid]:::host
+        end
+
+        subgraph Docker [🐳 Docker Container]
+            direction TB
+            
+            subgraph Drivers [Drivers & Vision]
+                Lidar_Node[ldlidar_node]:::sw
+                TF[static_tf_pub]:::sw
+                UDP_Cam[udp_camera_node]:::sw
+                Temp_Node[temp_node]:::sw
+            end
+
+            Brain{brain_node}:::brain
+
+            subgraph Comms [Communication & Flux]
+                Bridge[rosbridge]:::sw
+                Stream[web_video_server]:::sw
+            end
+
+            subgraph Actuators [Contrôle Moteurs]
+                Motor[motor_node]:::sw
+                Stepper[camera_stepper_node]:::sw
+            end
+        end
+
+        subgraph Hardware_Out [Sorties]
+            direction LR
+            L298N[⚙️ Moteurs Chenilles]:::hw
+            StepM[🔄 Stepper Tilt]:::hw
+        end
+    end
+
+    %% --- FLUX DE DONNÉES ---
+    
+    %% Vision
+    Cam --> RpiCam
+    RpiCam ==>|UDP 5000| UDP_Cam
+    UDP_Cam -->|/camera/image_raw| Brain
+
+    %% LiDAR (La correction est ici)
+    Lidar -.->|/dev/ttyUSB0| Lidar_Node
+    TF -.-> Lidar_Node
+    Lidar_Node -->|/scan| Brain
+    Lidar_Node -->|/scan| Bridge
+
+    %% Capteurs
+    Temp_S -.->|1-Wire| Temp_Node
+    Temp_Node -->|/tempSensor| Brain
+
+    %% Intelligence & Commandes
+    Bridge <-->|WebSocket 9090| UI
+    UI -->|Commandes Web| Bridge
+    Bridge -->|/cmd_vel_web| Brain
+    
+    Brain -->|/cmd_vel| Motor
+    Brain -->|/camera/tilt| Stepper
+    Brain -->|/image_processed| Stream
+    Brain -- "/tempSensor" --> Bridge
+
+    %% Physique
+    Motor -.->|GPIO| L298N
+    Stepper -.->|GPIO| StepM
+    Stream -->|HTTP 8080| UI

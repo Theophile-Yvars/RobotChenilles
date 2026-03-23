@@ -1,0 +1,77 @@
+#include "robot_brain/brain_node.hpp"
+#include <cv_bridge/cv_bridge.hpp>
+#include <opencv2/opencv.hpp>
+#include "std_msgs/msg/int32.hpp"
+#include <sensor_msgs/image_encodings.hpp>
+
+using namespace std::chrono_literals;
+
+BrainNode::BrainNode() : Node("brain_node") {
+    // Publishers
+    pub_motor_cmd_ = this->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
+    pub_processed_image_ = this->create_publisher<sensor_msgs::msg::Image>("/image_processed", 10);
+    pub_tilt_cmd_ = this->create_publisher<std_msgs::msg::Int32>("/camera/tilt", 10);
+
+    // Subscriptions
+    sub_temp_ = this->create_subscription<std_msgs::msg::Float32>(
+        "/tempSensor", 2, [this](const std_msgs::msg::Float32::SharedPtr msg) {
+            this->current_temp_ = msg->data;
+        });
+    sub_web_ = this->create_subscription<geometry_msgs::msg::Twist>(
+        "/cmd_vel_web", 10, [this](const geometry_msgs::msg::Twist::SharedPtr msg) {
+            this->web_cmd_ = *msg;
+        });
+    sub_image_ = this->create_subscription<sensor_msgs::msg::Image>(
+        "/camera/image_raw", 10, 
+        std::bind(&BrainNode::image_callback, this, std::placeholders::_1));
+    sub_cam_web_ = this->create_subscription<std_msgs::msg::Int32>(
+        "/cam_control_web", 10, [this](const std_msgs::msg::Int32::SharedPtr msg) {
+        this->pub_tilt_cmd_->publish(*msg);
+        RCLCPP_INFO(this->get_logger(), "Mouvement Caméra commandé : %d pas", msg->data);
+    });
+
+    timer_ = this->create_wall_timer(50ms, std::bind(&BrainNode::decision_loop, this));
+    
+    RCLCPP_INFO(this->get_logger(), "Node Cerveau démarré avec contrôle Tilt.");
+}
+
+void BrainNode::image_callback(const sensor_msgs::msg::Image::SharedPtr msg) {
+    try {
+        // 1. Conversion du message ROS en image OpenCV
+        cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+
+        // 2. Dessiner la température en haut à gauche
+        std::string temp_text = "Temp: " + std::to_string((int)this->current_temp_) + " C";
+        cv::putText(cv_ptr->image, temp_text, cv::Point(30, 50), 
+                    cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 255, 0), 2);
+
+        // 3. Publier l'image modifiée
+        pub_processed_image_->publish(*cv_ptr->toImageMsg());
+        
+    } catch (cv_bridge::Exception& e) {
+        RCLCPP_ERROR(this->get_logger(), "Erreur conversion cv_bridge: %s", e.what());
+    }
+}
+
+void BrainNode::decision_loop() {
+    geometry_msgs::msg::Twist final_cmd;
+
+    if (this->current_temp_ > 60.0f) {
+        final_cmd.linear.x = 0.0;
+        final_cmd.angular.z = 0.0;
+        RCLCPP_ERROR_THROTTLE(this->get_logger(), *this->get_clock(), 2000, 
+            "SURCHAUFFE (%.2f C) ! Arrêt moteur.", this->current_temp_);
+    } else {
+        final_cmd = this->web_cmd_;
+    }
+
+    pub_motor_cmd_->publish(final_cmd);
+}
+
+int main(int argc, char ** argv) {
+    rclcpp::init(argc, argv);
+    auto node = std::make_shared<BrainNode>();
+    rclcpp::spin(node);
+    rclcpp::shutdown();
+    return 0;
+}
